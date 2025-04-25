@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
-const config = require("config");
-const dbgr = require("debug")("development:mongoose");
+const dotenv = require("dotenv");
+const debug = require("debug")("app:mongoose");
 
-const mongoUri = `${config.get("MONGODB_URI")}/${config.get("DB_NAME")}`;
+// Load .env
+dotenv.config();
+
+// Load config from .env or fallback
+const mongoUri = `${process.env.MONGODB_URI || "mongodb://localhost:27017"}/${process.env.DB_NAME || "test"}`;
 
 console.log("Connecting to:", mongoUri);
 
@@ -11,10 +15,10 @@ mongoose.connect(mongoUri, {
     useUnifiedTopology: true,
 })
 .then(() => {
-    dbgr("MongoDB connected successfully.");
+    debug("✅ MongoDB connected successfully.");
 })
 .catch((err) => {
-    dbgr("MongoDB connection error:", err);
+    debug("❌ MongoDB connection error:", err);
 });
 
 module.exports = mongoose.connection;
