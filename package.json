@@ -4,7 +4,7 @@
   "description": "by ufdevs",
   "main": "app.js",
   "scripts": {
-    "test": "dev"
+    "test": "nodemon app.js"
   },
   "keywords": [
     "empowerhr",
@@ -16,6 +16,7 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
+    "config": "^3.3.12",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dayjs": "^1.11.13",
@@ -24,6 +25,7 @@
     "express-rate-limit": "^7.5.0",
     "express-session": "^1.18.1",
     "express-validator": "^7.2.1",
+    "geolib": "^3.3.4",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.13.2",
