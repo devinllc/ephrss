@@ -20,7 +20,9 @@ app.use(expressSession({
     secret: process.env.EXPRESS_SESSION_SECRET,
 }));
 app.use(express.static(path.join(__dirname, "public")));
-
+app.get("/",(req,res)=>{
+    res.send("test vercel");
+});
 app.use("/employees", employessRouter);
 app.use("/admin", adminRouter);
 app.listen(3000);
