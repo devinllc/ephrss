@@ -4,7 +4,8 @@
   "description": "by ufdevs",
   "main": "app.js",
   "scripts": {
-    "test": "nodemon app.js"
+    "test": "nodemon app.js",
+    "build": "node app.js"
   },
   "keywords": [
     "empowerhr",
