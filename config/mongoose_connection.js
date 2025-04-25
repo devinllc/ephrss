@@ -10,6 +10,11 @@ const mongoUri = `${process.env.MONGODB_URI || "mongodb://localhost:27017"}/${pr
 console.log("Connecting to:", mongoUri);
 
 mongoose.connect(mongoUri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000, // wait 5 seconds before throwing error
+  socketTimeoutMS: 45000, // 45 seconds socket timeout
+
 })
     .then(() => {
         debug("✅ MongoDB connected successfully.");
