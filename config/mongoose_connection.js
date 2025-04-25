@@ -1,13 +1,20 @@
-const mongoose=require("mongoose");
+const mongoose = require("mongoose");
 const config = require("config");
 const dbgr = require("debug")("development:mongoose");
-console.log("Connecting to:", `${config.get("MONGODB_URI")}/${config.get("COLLECTION")}`);
-mongoose.connect(`${config.get("MONGODB_URI")}/${config.get("COLLECTION")}`)
-.then(()=>{
-    dbgr("connected");
+
+const mongoUri = `${config.get("MONGODB_URI")}/${config.get("DB_NAME")}`;
+
+console.log("Connecting to:", mongoUri);
+
+mongoose.connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 })
-.catch((err)=>{
-    dbgr(err);
+.then(() => {
+    dbgr("MongoDB connected successfully.");
+})
+.catch((err) => {
+    dbgr("MongoDB connection error:", err);
 });
 
-module.exports=mongoose.connection;
+module.exports = mongoose.connection;
