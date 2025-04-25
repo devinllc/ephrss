@@ -10,14 +10,12 @@ const mongoUri = `${process.env.MONGODB_URI || "mongodb://localhost:27017"}/${pr
 console.log("Connecting to:", mongoUri);
 
 mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
 })
-.then(() => {
-    debug("✅ MongoDB connected successfully.");
-})
-.catch((err) => {
-    debug("❌ MongoDB connection error:", err);
-});
+    .then(() => {
+        debug("✅ MongoDB connected successfully.");
+    })
+    .catch((err) => {
+        debug("❌ MongoDB connection error:", err);
+    });
 
 module.exports = mongoose.connection;
