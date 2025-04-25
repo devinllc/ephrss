@@ -4,7 +4,8 @@ const debug = require("debug")("app:mongoose");
 
 // Load .env
 dotenv.config();
-
+mongoose.set('bufferCommands', false);
+mongoose.set('serverSelectionTimeoutMS', 30000);
 // Load config from .env or fallback
 const mongoUri = `${process.env.MONGODB_URI || "mongodb://localhost:27017"}/${process.env.DB_NAME || "test"}`;
 
