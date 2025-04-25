@@ -1,8 +1,8 @@
 const mongoose=require("mongoose");
 const config = require("config");
 const dbgr = require("debug")("development:mongoose");
-
-mongoose.connect(`${config.get("MONGODB_URI")}/${config.get("COLLOECTION")}`)
+console.log("Connecting to:", `${config.get("MONGODB_URI")}/${config.get("COLLECTION")}`);
+mongoose.connect(`${config.get("MONGODB_URI")}/${config.get("COLLECTION")}`)
 .then(()=>{
     dbgr("connected");
 })
