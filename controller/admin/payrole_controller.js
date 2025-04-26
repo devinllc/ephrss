@@ -4,14 +4,32 @@ const Payroll = require("../../model/payrole_model");
 
 module.exports.generatePayroll = async (req, res) => {
     try {
-        const {
+        let {
             employeeId,
             month,
             year,
+            totalWorkingDays,
             basicSalary,
             allowances = [],
             deductions = []
         } = req.body;
+
+        // Validation: Make sure basicSalary and totalWorkingDays are numbers
+        if (!basicSalary || isNaN(basicSalary)) {
+            return res.status(400).json({ message: "Invalid or missing basicSalary" });
+        }
+
+        if (!totalWorkingDays || isNaN(totalWorkingDays)) {
+            return res.status(400).json({ message: "Invalid or missing totalWorkingDays" });
+        }
+
+        // If allowances/deductions are empty strings, fix them
+        if (typeof allowances === 'string') {
+            allowances = [];
+        }
+        if (typeof deductions === 'string') {
+            deductions = [];
+        }
 
         const startDate = new Date(year, month - 1, 1);
         const endDate = new Date(year, month, 0);
@@ -37,14 +55,12 @@ module.exports.generatePayroll = async (req, res) => {
             return total + days;
         }, 0);
 
-        const totalWorkingDays = 22; // (OR dynamically based on month/weekends/public holidays)
-
         const paidDays = daysPresent + daysLeaveApproved;
         const perDaySalary = basicSalary / totalWorkingDays;
         const adjustedBasicSalary = perDaySalary * paidDays;
 
-        const totalAllowances = allowances.reduce((sum, item) => sum + item.amount, 0);
-        const totalDeductions = deductions.reduce((sum, item) => sum + item.amount, 0);
+        const totalAllowances = allowances.reduce((sum, item) => sum + (item.amount || 0), 0);
+        const totalDeductions = deductions.reduce((sum, item) => sum + (item.amount || 0), 0);
 
         const grossSalary = adjustedBasicSalary + totalAllowances;
         const netSalary = grossSalary - totalDeductions;
@@ -74,12 +90,13 @@ module.exports.generatePayroll = async (req, res) => {
     }
 };
 
+
 module.exports.approvePayroll = async (req, res) => {
     try {
-        const { payrollId } = req.params;
+        const { payrollId } = req.body;
         const adminId = req.user._id; // assuming admin user is authenticated
 
-        const payroll = await Payroll.findById(payrollId);
+        const payroll = await Payroll.findOne(payrollId);
 
         if (!payroll) {
             return res.status(404).json({ message: "Payroll not found" });
