@@ -9,6 +9,7 @@ const employessRouter = require("./routes/employee_router");
 const attendanceRouter = require("./routes/attendence_router");
 const leaveRouter = require("./routes/leave_router");
 const payroleRouter = require("./routes/payrole_router");
+const cors = require('cors');
 const db = require("./config/mongoose_connection");
 const admin_model = require("./model/admin_model");
 
@@ -24,6 +25,14 @@ app.use(express.static(path.join(__dirname, "public")));
 // }));
 
 
+
+// Configure CORS
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'https://yourfrontenddeploymenturl.com'],
+    credentials: true,  // This is important for cookies/auth
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
+}));
+
 app.get("/", (req, res) => {
     res.send("test vercel");
 });
@@ -33,5 +42,5 @@ app.use("/attendence", attendanceRouter);
 app.use("/leave", leaveRouter);
 app.use("/payrole", payroleRouter);
 
-app.listen(3000);
+// app.listen(3000);
 module.exports = app;

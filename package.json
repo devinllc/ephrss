@@ -14,6 +14,7 @@
   "author": "Ramesh Vishwakarma",
   "license": "ISC",
   "dependencies": {
+    "@vercel/node": "^2.0.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "config": "^3.3.12",
@@ -32,7 +33,6 @@
     "multer": "^1.4.5-lts.2",
     "nodemon": "^3.1.9",
     "socket.io": "^4.8.1",
-    "stripe": "^18.0.0",
-    "@vercel/node": "^2.0.0"
+    "stripe": "^18.0.0"
   }
 }
