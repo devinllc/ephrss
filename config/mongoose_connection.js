@@ -9,18 +9,38 @@ const mongoUri = `${process.env.MONGODB_URI || "mongodb://localhost:27017"}/${pr
 
 console.log("Connecting to:", mongoUri);
 
-mongoose.connect(mongoUri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 5000, // wait 5 seconds before throwing error
-  socketTimeoutMS: 45000, // 45 seconds socket timeout
+// Global mongoose connection cache (for Vercel/serverless)
+let cached = global.mongoose;
 
-})
-    .then(() => {
-        debug("✅ MongoDB connected successfully.");
-    })
-    .catch((err) => {
-        debug("❌ MongoDB connection error:", err);
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectMongo() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    }).then((mongoose) => {
+      debug("✅ MongoDB connected successfully.");
+      return mongoose;
+    }).catch((err) => {
+      debug("❌ MongoDB connection error:", err);
+      throw err;
     });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
+// Immediately start connecting (keep your auto-connect behavior)
+connectMongo();
 
 module.exports = mongoose.connection;

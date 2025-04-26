@@ -33,5 +33,5 @@ app.use("/attendence", attendanceRouter);
 app.use("/leave", leaveRouter);
 app.use("/payrole", payroleRouter);
 
-// app.listen(3000);
+app.listen(3000);
 module.exports = app;
