@@ -13,7 +13,7 @@ module.exports = async (req, res, next) => {
         const user = await admin_model.findOne({ email: decoded.email }).select('-password');
 
         if (!user) {
-            return res.status(404).json({ error: "U are not permitted to create employees" });
+            return res.status(404).json({ error: "U are not Permitted" });
         }
 
         req.user = user;
