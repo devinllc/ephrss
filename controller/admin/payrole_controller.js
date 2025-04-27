@@ -96,7 +96,7 @@ module.exports.approvePayroll = async (req, res) => {
         const { payrollId } = req.body;
         const adminId = req.user._id; // assuming admin user is authenticated
 
-        const payroll = await Payroll.findOne(payrollId);
+        const payroll = await Payroll.findById(payrollId);
 
         if (!payroll) {
             return res.status(404).json({ message: "Payroll not found" });

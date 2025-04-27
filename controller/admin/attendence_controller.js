@@ -2,11 +2,11 @@
 const Attendance = require('../../model/attendence_model');
 
 module.exports.verifyAttendance = async (req, res) => {
-  const { _id} = req.params;
+  const { id } = req.params;
   const { status } = req.body; // optional update by HR/Admin
 
   try {
-    const attendance = await Attendance.findOne(_id);
+    const attendance = await Attendance.findById(id);
     if (!attendance) {
       return res.status(404).json({ message: 'Attendance not found' });
     }
