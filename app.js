@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Configure CORS
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001', 'https://yourfrontenddeploymenturl.com'],
+    origin: ['http://localhost:3000', 'http://localhost:3001','http://localhost:5174', 'http://localhost:5173', 'https://yourfrontenddeploymenturl.com'],
     credentials: true,  // This is important for cookies/auth
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
 }));
