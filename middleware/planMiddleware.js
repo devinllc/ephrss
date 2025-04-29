@@ -15,7 +15,7 @@ const planMiddleware = (allowedPlans = []) => {
         }
 
         const PLAN_LIMITS = {
-            basic: 10,
+            basic: 15,
             pro: 25,
             enterprise: Infinity,
         };
