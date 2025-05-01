@@ -28,14 +28,30 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Configure CORS
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001','http://localhost:5174', 'http://localhost:5173', 'https://yourfrontenddeploymenturl.com'],
-    credentials: true,  // This is important for cookies/auth
+    origin: ['http://localhost:3000', 'http://localhost:3001','https://servs.ufdevs.me', 'http://localhost:5174', 'http://localhost:5173','https://servs.ufdevs.me/login','https://ufdevs.me'],
+    credentials: true,  
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
 }));
 
 app.get("/", (req, res) => {
-    res.send("test vercel");
+    res.status(200).json({
+        status: "OK",
+        message: "API is healthy",
+        timestamp: new Date().toISOString(),
+        project: {
+            name: "EMPOWER HR",
+            version: "1.0.0",
+            description: "PRODUCTION READY SCALABLE EMPLOYEE MANAGEMENT SYSTEM HIGLY SECURE",
+            by: "Ramesh Vishwakarma"
+        },
+        company: {
+            name: "UNFILTER DEVELOPERS (ufdevs.me)",
+            frontend: "https://servs.ufdevs.me",
+            contact: "7666893227"
+        }
+    });
 });
+
 app.use("/employees", employessRouter);
 app.use("/admin", adminRouter);
 app.use("/attendence", attendanceRouter);
