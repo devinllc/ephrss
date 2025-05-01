@@ -58,6 +58,7 @@ const Login = () => {
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
+                     "Authorization": `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(loginData),
