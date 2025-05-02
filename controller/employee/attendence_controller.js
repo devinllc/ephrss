@@ -21,7 +21,7 @@ module.exports.punchIn = async (req, res) => {
     try {
         const existing = await Attendance.findOne({ employee: employee._id, date: today });
         if (existing) {
-            return res.status(400).json({ message: "Already punched in today." });
+            return res.status(200).json({ message: "Already punched in today." });
         }
 
         // Create a new attendance record for the employee
@@ -62,7 +62,7 @@ module.exports.punchOut = async (req, res) => {
 
         // Check if punch-out is already done
         if (attendance.punchOut && attendance.punchOut.time) {
-            return res.status(400).json({ message: "You have already punched out today." });
+            return res.status(200).json({ message: "You have already punched out today." });
         }
 
         // Update the punch-out time and location

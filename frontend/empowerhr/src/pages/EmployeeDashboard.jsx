@@ -222,15 +222,7 @@ const EmployeeDashboard = () => {
             console.log('Fetching attendance status with token');
 
             // Method 3 from LoginTest: Fetch with token in URL worked
-            const response = await fetch(`/api/attendence/status?token=${token}`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
+            const response = await authenticatedFetch('/attendence/status');
             // Handle response parsing with helper function
             const data = await parseJsonResponse(response);
             console.log('Attendance response:', data);
