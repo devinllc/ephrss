@@ -5,9 +5,9 @@ const { generateToken } = require("../utils/generate_token");
 module.exports.adminSignup = async (req, res) => {
     console.log(process.env.NODE_ENV);
 
-    // Ensure the signup is allowed only in development environment
+    // Restrict signup in non-development environments
     if (process.env.NODE_ENV !== "development") {
-        return res.status(403).send("Signup is only allowed in development environment.");
+        return res.status(403).send("Signup is Restricted in this environment.");
     }
 
     try {
@@ -33,7 +33,7 @@ module.exports.adminSignup = async (req, res) => {
         res.cookie("token", token);
         res.status(201).json({
             message: "User created successfully",
-            token
+            token: token,
         });
         console.log("Admin created successfully");
     } catch (err) {
@@ -44,18 +44,18 @@ module.exports.adminSignup = async (req, res) => {
 module.exports.adminLogin = async (req, res) => {
     let { email, password } = req.body;
     let admin = await admin_model.findOne({ email: email });
-    if (!admin) return res.status(200).send("SOMETHING IS INCORRECT");
+    if (!admin) return res.status(400).send("SOMETHING IS INCORRECT");
     bcrypt.compare(password, admin.password, (err, result) => {
         if (result) {
             let token = generateToken(admin);
             res.cookie('token', token);
-            res.status(201).json({
+            res.status(200).json({
                 message: "admin login successfully",
                 token
             });
         }
         else {
-            return res.status(200).send("SOMETHING IS INCORRECT");
+            return res.status(400).send("SOMETHING IS INCORRECT");
         }
     });
 };
