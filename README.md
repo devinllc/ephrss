@@ -2,9 +2,13 @@
 
 ## Overview
 EmpowerHR is a complete HR management system backend API that provides employee management, attendance tracking, leave management, and payroll processing capabilities. This backend is built with Node.js, Express, and MongoDB with comprehensive role-based access control and subscription plans.
-## Backend API is hosted at: https://ephrssbackend.vercel.app/  https://ephrssbackend.vercel.app
-## Frontend is hosted at: clone the repo --
+## Note Frontend and Backend are Independent of each other so both can be tested separatelY as well !!!
+
+## Backend API is hosted at: `https://ephrssbackend.vercel.app/`  https://ephrssbackend.vercel.app
+## Frontend is hosted at:  `https://servs.ufdevs.me/login`  - https://servs.ufdevs.me
+### Local testing of Frontend 
 ### Steps
+#### Clone the Repo
 #### open in code editor then 
 ``` cd frontend ```
 #### again
@@ -17,8 +21,6 @@ EmpowerHR is a complete HR management system backend API that provides employee 
 #### Email and Password same for user and admin i.e 
 - email : ad@ts3.c 
 - password : ad@ts3.c
-
-
 
 ## Development Setup
 
