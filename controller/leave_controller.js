@@ -110,3 +110,55 @@ module.exports.viewLeaveRequests = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+/**
+ * @desc    Get all leave records with optional filters
+ * @route   GET /leaves/all
+ * @access  Admin / HR / SuperAdmin
+ */
+exports.getAllLeaves = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      status,
+      type,
+      employeeId,
+      fromDate,
+      toDate,
+    } = req.query;
+
+    const query = {};
+
+    if (status) query.status = status;
+    if (type) query.type = type;
+    if (employeeId) query.employee = employeeId;
+
+    if (fromDate || toDate) {
+      query.$or = [
+        { fromDate: { $gte: new Date(fromDate || "1970-01-01") } },
+        { toDate: { $lte: new Date(toDate || "2100-01-01") } },
+      ];
+    }
+
+    const leaves = await Leave.find(query)
+      .populate("employee", "name email department")
+      .populate("approvedBy", "name email role")
+      .sort({ appliedAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const total = await Leave.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit),
+      data: leaves,
+    });
+  } catch (error) {
+    console.error("Error fetching leave records:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

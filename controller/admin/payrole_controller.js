@@ -118,3 +118,61 @@ module.exports.approvePayroll = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+
+exports.getAllPayrolls = async (req, res) => {
+    try {
+        const {
+            page = 1,
+            limit = 20,
+            status,
+            month,
+            year,
+            employeeId,
+            sortBy = "createdAt",
+            sortOrder = "desc"
+        } = req.query;
+
+        const query = {};
+
+        // Filters
+        if (status) query.status = status;
+        if (month) query.month = parseInt(month);
+        if (year) query.year = parseInt(year);
+        if (employeeId) query.employee = employeeId;
+
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 },
+            populate: {
+                path: "employee approvedBy",
+                select: "name email role"
+            }
+        };
+
+        const payrolls = await Payroll.paginate ?
+            await Payroll.paginate(query, options) :
+            await Payroll.find(query)
+                .populate(options.populate)
+                .sort(options.sort)
+                .skip((options.page - 1) * options.limit)
+                .limit(options.limit);
+
+        const total = await Payroll.countDocuments(query);
+
+        res.status(200).json({
+            success: true,
+            data: payrolls,
+            total,
+            page: options.page,
+            totalPages: Math.ceil(total / options.limit)
+        });
+    } catch (error) {
+        console.error("Error fetching payrolls:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
