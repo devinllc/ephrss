@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import CreateEmployee from '../components/CreateEmployee';
 import { authenticatedFetch, parseJsonResponse, resetEmployeeDevice } from '../utils/api';
-
+import AttendanceList from './Attendance';
 // Mock data function for fallback
 const getMockEmployees = () => {
     return [
@@ -54,6 +54,14 @@ const AdminDashboard = () => {
     const [resetError, setResetError] = useState({ id: null, message: '' });
     const [showEmployeeDetails, setShowEmployeeDetails] = useState(false);
     const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState(null);
+    // const [showAttendance, setShowAttendance] = useState(false);
+
+    const handleClick = () => {
+        navigate('/attendance');
+    };
+    const handleLeaveClick = () => {
+        navigate('/attendance');
+    };
 
     useEffect(() => {
         // Check if user is logged in and is admin
@@ -366,10 +374,6 @@ const AdminDashboard = () => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex flex-wrap gap-1">
                                                         <button onClick={() => handleViewEmployee(employee)} className="action-button action-button-view">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                                <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10z" clipRule="evenodd" />
-                                                            </svg>
                                                             View
                                                         </button>
                                                         <button onClick={() => navigate(`/admin-payroll?employeeId=${employee._id}`)} className="action-button action-button-payroll">Payroll</button>
@@ -570,14 +574,38 @@ const AdminDashboard = () => {
                             <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                 <button
                                     type="button"
-                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm"
+                                    className="w-full inline-flex justify-center mb-4 rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm"
                                     onClick={() => setShowEmployeeDetails(false)}
                                 >
                                     Close
                                 </button>
                                 <button
                                     type="button"
-                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                    className="w-full inline-flex justify-center  mb-4 rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm"
+                                    onClick={() => handleClick()
+
+                                    }
+
+                                >
+                                    View Attendance Details
+                                </button>
+                                <button
+                                    type="button"
+                                    className="w-full inline-flex justify-center  mb-4 rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm"
+                                    onClick={() =>  navigate('/leave')}
+                                >
+                                    View Leave Request
+                                </button>
+                                <button
+                                    type="button"
+                                    className="w-full inline-flex justify-center  mb-4 rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm"
+                                    onClick={() => handleViewEmployee(employee)}
+                                >
+                                    View Payrole Details
+                                </button>
+                                <button
+                                    type="button"
+                                    className="mt-3 w-full mb-4 inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                                     onClick={() => {
                                         setShowEmployeeDetails(false);
                                         alert(`Edit employee: ${selectedEmployeeDetails.name}`);

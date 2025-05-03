@@ -6,7 +6,9 @@ import EmployeeDashboard from './pages/EmployeeDashboard';
 import ApplyLeave from './pages/ApplyLeave';
 import LoginTest from './components/LoginTest';
 import AdminPayrollDashboard from './pages/AdminPayrollDashboard';
+import AttendanceList from './pages/Attendance';
 import './App.css'
+import LeaveList from './pages/Leave';
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
         <Route path="/apply-leave" element={<ApplyLeave />} />
         <Route path="/test-api" element={<LoginTest />} />
         <Route path="/admin-payroll" element={<AdminPayrollDashboard />} />
+        <Route path="/attendance" element={<AttendanceList />} />
+        <Route path="/leave" element={<LeaveList />} />
       </Routes>
     </Router>
   );

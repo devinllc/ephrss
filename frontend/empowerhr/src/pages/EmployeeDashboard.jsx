@@ -373,137 +373,102 @@ const EmployeeDashboard = () => {
     const handlePunchIn = async () => {
         setIsPunchingIn(true);
         setError(null);
-
+    
         try {
-            // Try to get geolocation
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    try {
-                        const { latitude, longitude } = position.coords;
-                        console.log(`Location: ${latitude}, ${longitude}`);
-
-                        // Get the device ID from localStorage (same as used during login)
-                        const deviceId = localStorage.getItem('deviceId');
-                        if (!deviceId) {
-                            setError('Device ID not found. Please log out and log in again.');
-                            return;
-                        }
-
-                        // Prepare location data
-                        const locationData = {
-                            latitude,
-                            longitude,
-                            accuracy: position.coords.accuracy
-                        };
-
-                        console.log('Making punch-in request with location data and device ID');
-
-                        // Use authenticatedFetch with token in headers and body
-                        const response = await authenticatedFetch('/attendence/punch-in', {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                location: locationData,
-                                deviceId: deviceId
-                            })
-                        });
-
-                        // Check response
-                        const data = await parseJsonResponse(response);
-
-                        // Check if the request was successful
-                        if (response.ok && data.success) {
-                            console.log('Punch in successful:', data);
-
-                            // Display success message with current device time
-                            const successMsg = data.message || "Successfully punched in";
-                            const punchTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-
-                            // Show success message briefly
-                            setError(`${successMsg} at ${punchTime}`);
-
-                            // Clear the error message after 3 seconds
-                            setTimeout(() => setError(null), 3000);
-
-                            // Update the attendance status with the new data
-                            if (data.attendance) {
-                                // Use UTC-to-local conversion for server time
-                                const punchInServerTime = data.attendance.punchIn && data.attendance.punchIn.time
-                                    ? formatUTCtoLocalTime(data.attendance.punchIn.time)
-                                    : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-
-                                setAttendanceStatus({
-                                    date: data.attendance.date,
-                                    punchInTime: punchInServerTime,
-                                    punchOutTime: null,
-                                    status: data.attendance.status || 'present',
-                                    totalHours: data.attendance.totalHours || 0,
-                                    verified: data.attendance.verified || false,
-                                    location: data.attendance.punchIn ? data.attendance.punchIn.location : null,
-                                    rawJson: data,
-                                    originalPunchInTime: data.attendance.punchIn ? data.attendance.punchIn.time : null
-                                });
-
-                                // Update UI to show punch out button
-                                setIsPunchedIn(true);
-                            }
-
-                            // Refresh attendance status after successful punch in
-                            setTimeout(() => fetchAttendanceStatus(), 1000);
-                        } else {
-                            setError('Failed to punch in: ' + (data?.message || data?.error || 'Unknown error'));
-
-                            // Check if the error is because user is already punched in
-                            if (data?.message === 'Already punched in today.') {
-                                console.log('User is already punched in, updating UI to show punch-out button');
-                                setIsPunchedIn(true);
-
-                                // Fetch latest attendance status to get punch-in time
-                                fetchAttendanceStatus();
-                            }
-                        }
-
-                    } catch (err) {
-                        console.error('Error during punch-in request:', err);
-                        console.log('Error details:', err.response?.data || 'No response data');
-                        console.log('Error status:', err.response?.status || 'No status code');
-                        console.log('Current cookies:', document.cookie);
-                        setError('Failed to punch in. Please try again.');
-
-                        // Check if the error message indicates already punched in
-                        if (err.message && err.message.includes('Already punched in')) {
-                            console.log('Error indicates user is already punched in, updating UI');
-                            setIsPunchedIn(true);
-
-                            // Fetch latest attendance status to get punch-in time
-                            fetchAttendanceStatus();
-                        }
-                    }
-                },
-                (error) => {
-                    console.error('Location error:', error);
-                    // Provide more specific error message based on error code
-                    const errorMessages = {
-                        1: 'Location access denied. Please enable location permission in your browser settings.',
-                        2: 'Unable to determine your location. Please check if location services are enabled on your device.',
-                        3: 'Location request timed out. Please try again in an area with better signal.'
-                    };
-
-                    setError(errorMessages[error.code] || 'Location access required for punching in.');
-
-                    // Option to proceed with approximate location after warning
-                    if (error.code === 2) {
-                        setShowFallbackOption(true);
-                        setFallbackAction('in');
-                    }
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                });
+            });
+    
+            const { latitude, longitude } = position.coords;
+            console.log(`Location: ${latitude}, ${longitude}`);
+    
+            const deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                setError('Device ID not found. Please log out and log in again.');
+                return;
+            }
+    
+            const locationData = {
+                lat: latitude,
+                lng: longitude,
+            };
+    
+            // ✅ Fixed payload to match backend schema
+            const response = await authenticatedFetch('/attendence/punch-in', {
+                method: 'POST',
+                body: JSON.stringify({
+                    punchIn: {
+                        location: locationData
+                    },
+                    deviceId,
+                }),
+            });
+    
+            const data = await parseJsonResponse(response);
+    
+            if (response.ok && data.success) {
+                const serverPunchTime = data.attendance?.punchIn?.time
+                    ? formatUTCtoLocalTime(data.attendance.punchIn.time)
+                    : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    
+                setError(`${data.message || "Successfully punched in"} at ${serverPunchTime}`);
+                setTimeout(() => setError(null), 3000);
+    
+                setAttendanceStatus({
+                    date: data.attendance.date,
+                    punchInTime: serverPunchTime,
+                    punchOutTime: null,
+                    status: data.attendance.status || 'present',
+                    totalHours: data.attendance.totalHours || 0,
+                    verified: data.attendance.verified || false,
+                    location: data.attendance.punchIn?.location || null,
+                    rawJson: data,
+                    originalPunchInTime: data.attendance.punchIn?.time || null,
+                });
+    
+                setIsPunchedIn(true);
+                setTimeout(() => fetchAttendanceStatus(), 1000);
+            } else {
+                const errMsg = data?.message || data?.error || 'Unknown error';
+                setError('Failed to punch in: ' + errMsg);
+    
+                if (errMsg.includes('Already punched in')) {
+                    setIsPunchedIn(true);
+                    fetchAttendanceStatus();
                 }
-            );
+            }
         } catch (error) {
-            console.error('Error in handlePunchIn:', error);
-            setError('Failed to punch in. Please try again.');
+            console.error('Punch-in error:', error);
+    
+            if (error.code !== undefined) {
+                const locationErrors = {
+                    1: 'Location access denied. Please enable location permission in your browser settings.',
+                    2: 'Unable to determine your location. Please check if location services are enabled on your device.',
+                    3: 'Location request timed out. Please try again in an area with better signal.',
+                };
+                setError(locationErrors[error.code] || 'Location access required.');
+                if (error.code === 2) {
+                    setShowFallbackOption(true);
+                    setFallbackAction('in');
+                }
+            } else {
+                if (error?.message?.includes('Already punched in')) {
+                    setIsPunchedIn(true);
+                    fetchAttendanceStatus();
+                }
+                setError('Failed to punch in. Please try again.');
+            }
         } finally {
             setIsPunchingIn(false);
         }
     };
+    
+    
+    
 
     const handlePunchOut = async () => {
         setIsPunchingOut(true);
