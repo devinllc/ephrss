@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 const AdminSignup = () => {
     const [formData, setFormData] = useState({
         fullName: '',
@@ -45,7 +46,7 @@ const AdminSignup = () => {
 
             let data;
             try {
-                // Parse response if it's valid JSON
+                
                 if (responseText && contentType && contentType.includes('application/json')) {
                     data = JSON.parse(responseText);
                     console.log('Parsed signup response:', data);
