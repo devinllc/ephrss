@@ -21,7 +21,7 @@ const taskSchema = new mongoose.Schema({
 
   assignedTo: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // or "Employee"
+    ref: "Employee", // or "Employee"
     required: true
   },
 
@@ -72,7 +72,7 @@ const taskSchema = new mongoose.Schema({
   },
 
   comments: [{
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
     comment: String,
     commentedAt: { type: Date, default: Date.now }
   }],

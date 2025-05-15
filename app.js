@@ -9,6 +9,7 @@ const employessRouter = require("./routes/employee_router");
 const attendanceRouter = require("./routes/attendence_router");
 const leaveRouter = require("./routes/leave_router");
 const payroleRouter = require("./routes/payrole_router");
+const taskRouter = require("./routes/task_routes");
 const cors = require('cors');
 const db = require("./config/mongoose_connection");
 const admin_model = require("./model/admin_model");
@@ -57,6 +58,7 @@ app.use("/admin", adminRouter);
 app.use("/attendence", attendanceRouter);
 app.use("/leave", leaveRouter);
 app.use("/payrole", payroleRouter);
+app.use("/task", taskRouter);
 
 // app.listen(3000);// ✅ Only start server if not on Vercel
 if (process.env.NODE_ENV !== 'production') {
