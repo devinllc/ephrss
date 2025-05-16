@@ -51,93 +51,62 @@ function ensureTokenInCookies() {
 /**
  * Authenticated fetch that handles token inclusion with fallback mechanisms
  */
-export async function authenticatedFetch(endpoint, options = {}) {
-    // Ensure token is properly set in cookies
-    const token = ensureTokenInCookies();
-    console.log('Using token for request:', token ? 'Token found' : 'No token');
-
-    if (!token) {
-        console.error('No authentication token found');
-        throw new Error('Authentication required. Please log in again.');
-    }
-
-    // Set up default options - include Authorization header for backward compatibility
-    // but the main token authentication will be via cookies
-    const defaultOptions = {
-        credentials: 'include',  // Important: this sends cookies with the request
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            'Cookie': `token=${token}`  // Include token in Cookie header as well
-        }
+export const authenticatedFetch = async (endpoint, options = {}) => {
+    const token = localStorage.getItem('token') || Cookies.get('token');
+    
+    // Default headers for all requests
+    const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': window.location.origin,
+        ...options.headers
     };
 
-    // Merge options with defaults
-    const mergedOptions = {
-        ...defaultOptions,
-        ...options,
-        headers: {
-            ...defaultOptions.headers,
-            ...(options.headers || {})
-        }
-    };
-
-    // Handle token in body for POST/PUT/PATCH
-    if (['POST', 'PUT', 'PATCH'].includes(mergedOptions.method)) {
-        // Extract current body content if it exists
-        let bodyContent = {};
-        if (mergedOptions.body) {
-            try {
-                bodyContent = typeof mergedOptions.body === 'string'
-                    ? JSON.parse(mergedOptions.body)
-                    : mergedOptions.body;
-            } catch (e) {
-                console.warn('Could not parse body content for token inclusion', e);
-            }
-        }
-
-        // Add token to body
-        mergedOptions.body = JSON.stringify({
-            ...bodyContent,
-            token
-        });
+    // Add token to headers if it exists
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // For GET requests to specific endpoints that may need token as query parameter
-    let url = endpoint.startsWith('http')
-        ? endpoint
-        : `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+    // Construct the full URL
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
 
-    // Add token as query parameter for GET requests to these specific endpoints
-    if (!mergedOptions.method || mergedOptions.method === 'GET') {
-        if (endpoint.includes('/attendence/') || endpoint.includes('/employees/') || endpoint.includes('/leave/') || endpoint.includes('/task/')) {
-            const separator = url.includes('?') ? '&' : '?';
-            url = `${url}${separator}token=${token}`;
-            console.log('Added token as query parameter');
-        }
-    }
-
-    console.log(`Fetching from ${url} with options:`, mergedOptions);
+    // Add token as query parameter for specific endpoints
+    const tokenEndpoints = ['/task/', '/attendence/', '/employees/'];
+    const shouldAddTokenToQuery = tokenEndpoints.some(ep => endpoint.startsWith(ep));
+    
+    const finalUrl = shouldAddTokenToQuery && token 
+        ? `${url}${url.includes('?') ? '&' : '?'}token=${token}`
+        : url;
 
     try {
-        const response = await fetch(url, mergedOptions);
+        console.log(`Fetching from ${finalUrl} with options:`, { credentials: 'include', headers });
+        
+        const response = await fetch(finalUrl, {
+            ...options,
+            headers,
+            credentials: 'include',
+            mode: 'cors'
+        });
 
-        // Handle 401 Unauthorized specifically
-        if (response.status === 401) {
-            console.error('Authentication failed (401)');
-            // Could clear tokens here if needed
-            Cookies.remove('token');
-            Cookies.remove('user');
-            throw new Error('Your session has expired. Please log in again.');
+        // Handle CORS preflight
+        if (response.status === 204) {
+            return { success: true };
         }
 
-        return response;
+        // Check if the response is JSON
+        const contentType = response.headers.get('content-type');
+        console.log('Response content type:', contentType);
+        
+        if (contentType && contentType.includes('application/json')) {
+            return response;
+        }
 
+        throw new Error('Invalid response format');
     } catch (error) {
         console.error('Fetch error:', error);
         throw error;
     }
-}
+};
 
 /**
  * Authenticated fetch that sends token in the request body
@@ -262,8 +231,11 @@ export async function loginEmployee(email, password, deviceId) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Origin': window.location.origin
             },
             body: JSON.stringify(loginData),
+            mode: 'cors',
             credentials: 'include'
         });
 
@@ -276,17 +248,32 @@ export async function loginEmployee(email, password, deviceId) {
         // Store token if available in the response
         if (data.token) {
             // Set token in Cookie with appropriate attributes
-            Cookies.set('token', data.token, { expires: 7 });
+            Cookies.set('token', data.token, { 
+                expires: 7,
+                path: '/',
+                sameSite: 'none',
+                secure: window.location.protocol === 'https:'
+            });
             localStorage.setItem('authToken', data.token);
 
             // For CORS requests that need the token in document.cookie
             document.cookie = `token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=None; ${window.location.protocol === 'https:' ? 'Secure' : ''}`;
 
             // Store user role and data
-            Cookies.set('userRole', 'employee', { expires: 7 });
+            Cookies.set('userRole', 'employee', { 
+                expires: 7,
+                path: '/',
+                sameSite: 'none',
+                secure: window.location.protocol === 'https:'
+            });
             const userData = data.employee || {};
             localStorage.setItem('userData', JSON.stringify(userData));
-            Cookies.set('userData', JSON.stringify(userData), { expires: 7 });
+            Cookies.set('userData', JSON.stringify(userData), { 
+                expires: 7,
+                path: '/',
+                sameSite: 'none',
+                secure: window.location.protocol === 'https:'
+            });
         }
 
         return data;
@@ -389,4 +376,58 @@ export async function getAttendanceStatusWithTokenInBody() {
         console.error('Error fetching attendance status with token in body:', error);
         throw error;
     }
-} 
+}
+
+// Update fetchEmployees to use the correct endpoint
+export const fetchEmployees = async () => {
+    try {
+        // Changed from /employee/list to /employees
+        const response = await authenticatedFetch('/employees', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Handle non-200 responses
+        if (!response.ok) {
+            throw new Error(`Failed to fetch employees: ${response.status}`);
+        }
+
+        const data = await parseJsonResponse(response);
+        
+        if (data.success) {
+            return { success: true, data: data.data || data.employees || [] };
+        } else {
+            throw new Error(data.message || 'Failed to fetch employees');
+        }
+    } catch (error) {
+        console.error('Error fetching employees:', error);
+        throw error;
+    }
+};
+
+// Add a new function for creating tasks
+export const createTask = async (taskData) => {
+    try {
+        const response = await authenticatedFetch('/task', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(taskData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to create task: ${response.status}`);
+        }
+
+        const data = await parseJsonResponse(response);
+        return data;
+    } catch (error) {
+        console.error('Error creating task:', error);
+        throw error;
+    }
+}; 

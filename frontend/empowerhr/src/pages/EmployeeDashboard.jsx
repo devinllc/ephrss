@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import { FiClock, FiCalendar, FiUser, FiMail, FiBriefcase, FiPhone, FiCheck, FiX, FiCheckCircle, FiList, FiAlertCircle } from 'react-icons/fi';
+import { FiClock, FiCalendar, FiUser, FiMail, FiBriefcase, FiPhone, FiCheck, FiX, FiCheckCircle, FiList, FiAlertCircle, FiPlus } from 'react-icons/fi';
 import { getAttendanceStatus, authenticatedFetch, parseJsonResponse, getAttendanceStatusWithTokenInBody } from '../utils/api';
 
 // Global axios config
@@ -1306,11 +1306,11 @@ const EmployeeDashboard = () => {
                                         </div>
                                     )}
                                     <button
-                                        onClick={() => navigate('/task-dashboard')}
+                                        onClick={() => navigate('/tasks')}
                                         className="w-full btn btn-primary flex items-center justify-center space-x-2 mt-4"
                                     >
-                                        <FiCheckCircle className="h-5 w-5" />
-                                        <span>View All Tasks</span>
+                                        <FiPlus className="h-5 w-5" />
+                                        <span>Manage Tasks</span>
                                     </button>
                                 </div>
                             </div>

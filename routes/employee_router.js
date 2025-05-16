@@ -4,12 +4,13 @@ const { createEmployees, employeeLogin, employeeLogout } = require("../controlle
 const isloginMiddleware = require("../middleware/isloginMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 const planMiddleware = require("../middleware/planMiddleware");
-const { getAllEmployees } = require("../controller/admin/get_all_employees_controller");
+const { getAllEmployees, getAllEmployeess } = require("../controller/admin/get_all_employees_controller");
 
 router.post("/create", isloginMiddleware, roleMiddleware(["admin", "hr"]), planMiddleware(['basic', 'pro', 'enterprise']), createEmployees);
 router.post("/login", employeeLogin);
 router.get("/logout", employeeLogout);
-router.get("/all", isloginMiddleware, roleMiddleware(["admin", "hr"]), getAllEmployees);
+router.get("/alls", getAllEmployees);
+router.get("/all", getAllEmployeess);
 
 
 

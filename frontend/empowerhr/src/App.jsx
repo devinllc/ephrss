@@ -1,37 +1,56 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import AdminSignup from './pages/AdminSignup';
-import AdminDashboard from './pages/AdminDashboard';
-import EmployeeDashboard from './pages/EmployeeDashboard';
-import ApplyLeave from './pages/ApplyLeave';
-import LoginTest from './components/LoginTest';
-import AdminPayrollDashboard from './pages/AdminPayrollDashboard';
-import AttendanceList from './pages/Attendance';
-import './App.css'
-import LeaveList from './pages/Leave';
-import TaskManagement from './components/TaskManagement';
-import TaskDashboard from './components/TaskDashboard';
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import TaskManagement from "./pages/TaskManagement";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check authentication status
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/admin-signup" element={<AdminSignup />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
-        <Route path="/apply-leave" element={<ApplyLeave />} />
-        <Route path="/test-api" element={<LoginTest />} />
-        <Route path="/admin-payroll" element={<AdminPayrollDashboard />} />
-        <Route path="/attendance" element={<AttendanceList />} />
-        <Route path="/leave" element={<LeaveList />} />
+        {/* Public routes */}
+        <Route 
+          path="/login" 
+          element={
+            isAuthenticated ? <Navigate to="/" replace /> : <Login />
+          } 
+        />
+        <Route 
+          path="/signup" 
+          element={
+            isAuthenticated ? <Navigate to="/" replace /> : <Signup />
+          } 
+        />
         
-        {/* Task Management Routes */}
-        <Route path="/tasks" element={<TaskManagement />} />
-        <Route path="/tasks/new" element={<TaskManagement />} />
-        <Route path="/tasks/:id" element={<TaskManagement />} />
-        <Route path="/task-dashboard" element={<TaskDashboard />} />
+        {/* Protected routes */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <TaskManagement />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

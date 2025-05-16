@@ -40,14 +40,21 @@ const TaskDashboard = () => {
     const fetchDashboardData = async (userId) => {
         try {
             setLoading(true);
-            const response = await authenticatedFetch(`/task/user/${userId}/dashboard`);
+            const response = await authenticatedFetch(`/task/${userId}`);
             const data = await parseJsonResponse(response);
             
             if (data) {
+                const tasks = Array.isArray(data) ? data : [];
+                const now = new Date();
+                
                 setDashboardData({
-                    assignedTasks: data.assignedTasks || [],
-                    createdTasks: data.createdTasks || [],
-                    overdueTasks: data.overdueTasks || []
+                    assignedTasks: tasks.filter(task => task.status !== 'cancelled'),
+                    createdTasks: tasks.filter(task => task.createdBy === userId),
+                    overdueTasks: tasks.filter(task => 
+                        task.status !== 'completed' && 
+                        task.status !== 'cancelled' && 
+                        new Date(task.deadline) < now
+                    )
                 });
             }
         } catch (err) {
