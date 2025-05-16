@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import { FiClock, FiCalendar, FiUser, FiMail, FiBriefcase, FiPhone, FiCheck, FiX } from 'react-icons/fi';
+import { FiClock, FiCalendar, FiUser, FiMail, FiBriefcase, FiPhone, FiCheck, FiX, FiCheckCircle, FiList, FiAlertCircle } from 'react-icons/fi';
 import { getAttendanceStatus, authenticatedFetch, parseJsonResponse, getAttendanceStatusWithTokenInBody } from '../utils/api';
 
 // Global axios config
@@ -34,6 +34,9 @@ const EmployeeDashboard = () => {
     });
     const [showPayrollModal, setShowPayrollModal] = useState(false);
     const [selectedPayroll, setSelectedPayroll] = useState(null);
+    const [tasks, setTasks] = useState([]);
+    const [isLoadingTasks, setIsLoadingTasks] = useState(true);
+    const [taskError, setTaskError] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -108,6 +111,7 @@ const EmployeeDashboard = () => {
         fetchAttendanceStatus();
         fetchLeaveRequests();
         fetchPayrollStatus();
+        fetchTasks();
 
         // Attendance history is a premium feature - empty array for now
         setAttendanceHistory([]);
@@ -809,6 +813,88 @@ const EmployeeDashboard = () => {
         setShowPayrollModal(true);
     };
 
+    // Add new function to fetch tasks
+    const fetchTasks = async () => {
+        setIsLoadingTasks(true);
+        setTaskError(null);
+        try {
+            const response = await authenticatedFetch('/task/user/assigned');
+            if (response.ok) {
+                const data = await parseJsonResponse(response);
+                if (data && Array.isArray(data)) {
+                    setTasks(data);
+                } else {
+                    setTasks([]);
+                }
+            } else {
+                throw new Error('Failed to fetch tasks');
+            }
+        } catch (err) {
+            console.error('Error fetching tasks:', err);
+            setTaskError('Failed to load tasks');
+            setTasks([]);
+        } finally {
+            setIsLoadingTasks(false);
+        }
+    };
+
+    // Add function to update task status
+    const handleTaskStatusUpdate = async (taskId, newStatus) => {
+        try {
+            const response = await authenticatedFetch(`/task/${taskId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus, token: Cookies.get('token') })
+            });
+
+            if (response.ok) {
+                // Update the task in the local state
+                setTasks(prevTasks =>
+                    prevTasks.map(task =>
+                        task._id === taskId ? { ...task, status: newStatus } : task
+                    )
+                );
+            } else {
+                throw new Error('Failed to update task status');
+            }
+        } catch (err) {
+            console.error('Error updating task status:', err);
+            setTaskError('Failed to update task status');
+        }
+    };
+
+    // Add helper function for task status color
+    const getTaskStatusColor = (status) => {
+        switch (status) {
+            case 'completed':
+                return 'bg-green-100 text-green-800';
+            case 'in_progress':
+                return 'bg-blue-100 text-blue-800';
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'overdue':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    // Add helper function for task priority color
+    const getTaskPriorityColor = (priority) => {
+        switch (priority) {
+            case 'high':
+                return 'bg-red-100 text-red-800';
+            case 'medium':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'low':
+                return 'bg-green-100 text-green-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
     return (
         <div className="employee-dashboard">
             <div className="flex flex-col min-h-screen bg-gray-lightest">
@@ -1148,6 +1234,85 @@ const EmployeeDashboard = () => {
                                         <p className="text-gray-500">No payroll records found</p>
                                     </div>
                                 )}
+                            </div>
+                        </div>
+
+                        {/* Task Management Section */}
+                        <div className="md:col-span-1">
+                            <div className="card hover-lift h-full">
+                                <h3 className="section-title text-xl font-semibold mb-4">Task Management</h3>
+                                <div className="space-y-4">
+                                    {isLoadingTasks ? (
+                                        <div className="animate-pulse space-y-4">
+                                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                            <div className="h-20 bg-gray-200 rounded"></div>
+                                            <div className="h-20 bg-gray-200 rounded"></div>
+                                        </div>
+                                    ) : taskError ? (
+                                        <div className="text-center p-4 bg-red-50 rounded-lg">
+                                            <FiAlertCircle className="w-6 h-6 text-red-500 mx-auto mb-2" />
+                                            <p className="text-red-600">{taskError}</p>
+                                        </div>
+                                    ) : tasks.length > 0 ? (
+                                        <div className="space-y-4 max-h-[400px] overflow-y-auto">
+                                            {tasks.map((task) => (
+                                                <div key={task._id} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <h4 className="font-medium text-gray-900">{task.title}</h4>
+                                                        <span className={`px-2 py-1 text-xs rounded-full ${getTaskPriorityColor(task.priority)}`}>
+                                                            {task.priority}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                                                    <div className="flex flex-wrap gap-2 mb-3">
+                                                        <span className={`px-2 py-1 text-xs rounded-full ${getTaskStatusColor(task.status)}`}>
+                                                            {task.status.replace('_', ' ')}
+                                                        </span>
+                                                        <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
+                                                            Due: {new Date(task.deadline).toLocaleDateString()}
+                                                        </span>
+                                                    </div>
+                                                    {task.status !== 'completed' && (
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() => handleTaskStatusUpdate(task._id, 'in_progress')}
+                                                                className={`px-3 py-1 text-xs rounded-full ${
+                                                                    task.status === 'in_progress'
+                                                                        ? 'bg-blue-500 text-white'
+                                                                        : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                                                                }`}
+                                                            >
+                                                                In Progress
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleTaskStatusUpdate(task._id, 'completed')}
+                                                                className={`px-3 py-1 text-xs rounded-full ${
+                                                                    task.status === 'completed'
+                                                                        ? 'bg-green-500 text-white'
+                                                                        : 'bg-green-100 text-green-800 hover:bg-green-200'
+                                                                }`}
+                                                            >
+                                                                Complete
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center p-6 bg-gray-50 rounded-lg">
+                                            <FiList className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                            <p className="text-gray-500">No tasks assigned</p>
+                                        </div>
+                                    )}
+                                    <button
+                                        onClick={() => navigate('/task-dashboard')}
+                                        className="w-full btn btn-primary flex items-center justify-center space-x-2 mt-4"
+                                    >
+                                        <FiCheckCircle className="h-5 w-5" />
+                                        <span>View All Tasks</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

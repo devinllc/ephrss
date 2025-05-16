@@ -1,9 +1,7 @@
 import Cookies from 'js-cookie';
 
-// Define a base URL that uses the proxy in development or the actual URL in production
-const API_BASE_URL = import.meta.env.DEV
-    ? '/api'
-    : 'https://ephrssbackend.vercel.app';
+// Define a base URL that uses the actual backend URL in both development and production
+const API_BASE_URL = 'https://ephrssbackend.vercel.app';
 
 /**
  * Parse JSON response with enhanced error handling
@@ -112,7 +110,7 @@ export async function authenticatedFetch(endpoint, options = {}) {
 
     // Add token as query parameter for GET requests to these specific endpoints
     if (!mergedOptions.method || mergedOptions.method === 'GET') {
-        if (endpoint.includes('/attendence/') || endpoint.includes('/employees/') || endpoint.includes('/leave/')) {
+        if (endpoint.includes('/attendence/') || endpoint.includes('/employees/') || endpoint.includes('/leave/') || endpoint.includes('/task/')) {
             const separator = url.includes('?') ? '&' : '?';
             url = `${url}${separator}token=${token}`;
             console.log('Added token as query parameter');

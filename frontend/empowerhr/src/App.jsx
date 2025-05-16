@@ -9,6 +9,8 @@ import AdminPayrollDashboard from './pages/AdminPayrollDashboard';
 import AttendanceList from './pages/Attendance';
 import './App.css'
 import LeaveList from './pages/Leave';
+import TaskManagement from './components/TaskManagement';
+import TaskDashboard from './components/TaskDashboard';
 
 function App() {
   return (
@@ -24,6 +26,12 @@ function App() {
         <Route path="/admin-payroll" element={<AdminPayrollDashboard />} />
         <Route path="/attendance" element={<AttendanceList />} />
         <Route path="/leave" element={<LeaveList />} />
+        
+        {/* Task Management Routes */}
+        <Route path="/tasks" element={<TaskManagement />} />
+        <Route path="/tasks/new" element={<TaskManagement />} />
+        <Route path="/tasks/:id" element={<TaskManagement />} />
+        <Route path="/task-dashboard" element={<TaskDashboard />} />
       </Routes>
     </Router>
   );

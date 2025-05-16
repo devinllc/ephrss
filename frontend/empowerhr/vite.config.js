@@ -23,10 +23,11 @@ export default defineConfig({
             console.log('proxy error', err);
           });
           proxy.on('proxyReq', (proxyReq, req, _res) => {
-            console.log('Sending Request:', req.method, req.url);
+            // Log the actual URL being requested
+            console.log('Proxying request to:', req.method, req.url, '->', proxyReq.path);
           });
           proxy.on('proxyRes', (proxyRes, req, _res) => {
-            console.log('Received Response from:', req.url, proxyRes.statusCode);
+            console.log('Received response from:', req.url, '->', proxyRes.statusCode);
           });
         }
       }

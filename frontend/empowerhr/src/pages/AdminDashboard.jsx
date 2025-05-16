@@ -4,6 +4,8 @@ import Cookies from 'js-cookie';
 import CreateEmployee from '../components/CreateEmployee';
 import { authenticatedFetch, parseJsonResponse, resetEmployeeDevice } from '../utils/api';
 import AttendanceList from './Attendance';
+import { FiCheckCircle, FiPlus } from 'react-icons/fi';
+import TaskForm from '../components/TaskForm';
 // Mock data function for fallback
 const getMockEmployees = () => {
     return [
@@ -54,7 +56,8 @@ const AdminDashboard = () => {
     const [resetError, setResetError] = useState({ id: null, message: '' });
     const [showEmployeeDetails, setShowEmployeeDetails] = useState(false);
     const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState(null);
-    // const [showAttendance, setShowAttendance] = useState(false);
+    const [showTaskModal, setShowTaskModal] = useState(false);
+    const [adminId, setAdminId] = useState(null);
 
     const handleClick = () => {
         navigate('/attendance');
@@ -89,6 +92,32 @@ const AdminDashboard = () => {
         }
 
         fetchEmployees();
+
+        // Fetch admin ID when component mounts
+        const fetchAdminId = async () => {
+            try {
+                // Get admin ID from userData in cookies instead of making an API call
+                const userDataString = Cookies.get('userData');
+                if (userDataString) {
+                    const userData = JSON.parse(userDataString);
+                    if (userData._id) {
+                        setAdminId(userData._id);
+                        return;
+                    }
+                }
+                // Fallback to token payload if userData is not available
+                const token = Cookies.get('token');
+                if (token) {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.id) {
+                        setAdminId(payload.id);
+                    }
+                }
+            } catch (err) {
+                console.error('Error getting admin ID:', err);
+            }
+        };
+        fetchAdminId();
     }, [navigate]);
 
     const fetchEmployees = async () => {
@@ -259,6 +288,39 @@ const AdminDashboard = () => {
         setShowEmployeeDetails(true);
     };
 
+    const handleCreateTask = async (taskData) => {
+        try {
+            const response = await fetch('https://ephrssbackend.vercel.app/task/', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('token')}`
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    ...taskData,
+                    createdBy: adminId,
+                    token: Cookies.get('token')
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || 'Failed to create task');
+            }
+
+            const data = await response.json();
+            if (data) {
+                setShowTaskModal(false);
+                // Refresh the page to show the new task
+                window.location.reload();
+            }
+        } catch (err) {
+            console.error('Error creating task:', err);
+            throw new Error(err.message || 'Failed to create task');
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen bg-gray-50">
@@ -395,6 +457,31 @@ const AdminDashboard = () => {
                                     )}
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white shadow-lg rounded-xl overflow-hidden mb-8 card">
+                    <div className="p-6">
+                        <h2 className="text-2xl font-semibold text-gray-dark mb-6">Task Management</h2>
+                        <div className="space-y-4">
+                            <p className="text-gray-600">Create and manage tasks for your team members.</p>
+                            <div className="flex space-x-4">
+                                <button
+                                    onClick={() => navigate('/tasks')}
+                                    className="btn btn-primary flex items-center space-x-2"
+                                >
+                                    <FiCheckCircle className="h-5 w-5" />
+                                    <span>View All Tasks</span>
+                                </button>
+                                <button
+                                    onClick={() => setShowTaskModal(true)}
+                                    className="btn btn-primary flex items-center space-x-2"
+                                >
+                                    <FiPlus className="h-5 w-5" />
+                                    <span>Create Task</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -617,6 +704,15 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* TaskForm Modal */}
+            {showTaskModal && (
+                <TaskForm
+                    onSubmit={handleCreateTask}
+                    onClose={() => setShowTaskModal(false)}
+                    adminId={adminId}
+                />
             )}
 
         </div>
