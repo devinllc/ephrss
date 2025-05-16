@@ -18,12 +18,11 @@ const taskSchema = new mongoose.Schema({
     type: String,
     default: ""
   },
-
-  assignedTo: {
+  assignedTo: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Employee", // or "Employee"
+    ref: "Employee",
     required: true
-  },
+  }],
 
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

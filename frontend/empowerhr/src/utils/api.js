@@ -381,51 +381,53 @@ export async function getAttendanceStatusWithTokenInBody() {
 // Update fetchEmployees to use the correct endpoint
 export const fetchEmployees = async () => {
     try {
-        // Changed from /employee/list to /employees
-        const response = await authenticatedFetch('/employees', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-
-        // Handle non-200 responses
+        const response = await authenticatedFetch('/employees/all');
         if (!response.ok) {
             throw new Error(`Failed to fetch employees: ${response.status}`);
         }
-
         const data = await parseJsonResponse(response);
-        
-        if (data.success) {
-            return { success: true, data: data.data || data.employees || [] };
-        } else {
-            throw new Error(data.message || 'Failed to fetch employees');
-        }
+        // The API returns { total, page, limit, data: [...] }
+        return {
+            success: true,
+            data: data.data || [] // Use data.data since that's where the employee array is
+        };
     } catch (error) {
         console.error('Error fetching employees:', error);
-        throw error;
+        return {
+            success: false,
+            message: error.message || 'Failed to fetch employees'
+        };
     }
 };
 
 // Add a new function for creating tasks
 export const createTask = async (taskData) => {
     try {
-        const response = await authenticatedFetch('/task', {
+        // Get token from localStorage or cookies
+        const token = localStorage.getItem('token') || Cookies.get('token');
+        
+        const response = await fetch(`${API_BASE_URL}/task/`, {
             method: 'POST',
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
-            body: JSON.stringify(taskData)
+            body: JSON.stringify({
+                ...taskData,
+                token // Include token in the body
+            })
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to create task: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Failed to create task: ${response.status}`);
         }
 
-        const data = await parseJsonResponse(response);
-        return data;
+        const data = await response.json();
+        return {
+            success: true,
+            data: data
+        };
     } catch (error) {
         console.error('Error creating task:', error);
         throw error;

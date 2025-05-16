@@ -41,7 +41,7 @@ const CreateTaskForm = ({ onClose, onSubmit, users }) => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        assignedTo: '',
+        assignedTo: [],
         deadline: '',
         priority: 'medium'
     });
@@ -52,7 +52,7 @@ const CreateTaskForm = ({ onClose, onSubmit, users }) => {
         setFormData({
             title: '',
             description: '',
-            assignedTo: '',
+            assignedTo: [],
             deadline: '',
             priority: 'medium'
         });
@@ -101,23 +101,32 @@ const CreateTaskForm = ({ onClose, onSubmit, users }) => {
                 </div>
 
                 <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Assign To</label>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Assign To (Multiple)</label>
                     <select
+                        multiple
                         value={formData.assignedTo}
-                        onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
+                        onChange={(e) => {
+                            const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+                            setFormData({ ...formData, assignedTo: selectedOptions });
+                        }}
                         style={{
                             width: '100%',
                             padding: '8px 12px',
                             border: '1px solid #d1d5db',
-                            borderRadius: '6px'
+                            borderRadius: '6px',
+                            minHeight: '100px'
                         }}
                         required
                     >
-                        <option value="">Select Employee</option>
                         {users.map(user => (
-                            <option key={user._id} value={user._id}>{user.name}</option>
+                            <option key={user._id} value={user._id}>
+                                {user.email} {user.name ? `(${user.name})` : ''}
+                            </option>
                         ))}
                     </select>
+                    <small style={{ color: '#6b7280', marginTop: '4px', display: 'block' }}>
+                        Hold Ctrl/Cmd to select multiple users
+                    </small>
                 </div>
 
                 <div>
