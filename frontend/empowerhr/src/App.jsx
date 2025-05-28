@@ -2,16 +2,14 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import TaskManagement from "./pages/TaskManagement";
-import ProtectedRoute from "./components/ProtectedRoute";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check authentication status
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     setIsAuthenticated(!!token);
     setIsLoading(false);
   }, []);
@@ -24,32 +22,28 @@ function App() {
     <Router>
       <Routes>
         {/* Public routes */}
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
-            isAuthenticated ? <Navigate to="/" replace /> : <Login />
-          } 
+            isAuthenticated ? <Navigate to="/" replace /> : <Login onLogin={() => setIsAuthenticated(true)} />
+          }
         />
-        <Route 
-          path="/signup" 
+        <Route
+          path="/signup"
           element={
             isAuthenticated ? <Navigate to="/" replace /> : <Signup />
-          } 
+          }
         />
-        
-        {/* Protected routes */}
+
+        {/* Protected route */}
         <Route
           path="/"
           element={
-            isAuthenticated ? (
-              <TaskManagement />
-            ) : (
-              <Navigate to="/login" replace />
-            )
+            isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" replace />
           }
         />
-        
-        {/* Catch all route */}
+
+        {/* Catch all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
