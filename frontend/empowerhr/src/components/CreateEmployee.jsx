@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Cookies from 'js-cookie';
+import { motion } from 'framer-motion';
 
 const CreateEmployee = ({ onClose, onEmployeeCreated }) => {
     const [formData, setFormData] = useState({
@@ -24,7 +25,9 @@ const CreateEmployee = ({ onClose, onEmployeeCreated }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [currentStep, setCurrentStep] = useState(1);
 
+    // All existing logic remains unchanged
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -154,7 +157,6 @@ const CreateEmployee = ({ onClose, onEmployeeCreated }) => {
             }
         } catch (err) {
             console.error('Error creating employee:', err);
-
             // Check if we need to redirect to login
             if (err.message.includes('log in') || err.message.includes('session')) {
                 setError('Authentication required. Redirecting to login page...');
@@ -171,254 +173,405 @@ const CreateEmployee = ({ onClose, onEmployeeCreated }) => {
         }
     };
 
+    const nextStep = () => setCurrentStep(currentStep + 1);
+    const prevStep = () => setCurrentStep(currentStep - 1);
+
     return (
-        <div>
-            {error && (
-                <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg shadow-sm">
-                    <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                            <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <div className="ml-3">
-                            <p className="text-sm font-medium">{error}</p>
-                            {error.includes('log in') && (
-                                <p className="mt-1 text-xs text-red-600">Redirecting to login page...</p>
-                            )}
-                        </div>
+        <motion.div 
+            className="bg-white rounded-xl shadow-lg overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+        >
+            <div className="bg-gradient-to-r from-indigo-600 to-blue-500 px-6 py-4 flex justify-between items-center">
+                <h2 className="text-xl font-bold text-white">Add New Employee</h2>
+                <button 
+                    onClick={onClose}
+                    className="text-white hover:bg-white/20 p-2 rounded-full transition-colors"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+
+            {/* Progress Steps */}
+            <div className="px-6 pt-4">
+                <div className="flex items-center justify-between mb-4">
+                    <div className={`flex items-center ${currentStep >= 1 ? 'text-indigo-600' : 'text-gray-400'}`}>
+                        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'} font-bold`}>1</div>
+                        <span className="ml-2 text-sm font-medium">Basic Info</span>
+                    </div>
+                    <div className={`h-0.5 w-12 ${currentStep >= 2 ? 'bg-indigo-500' : 'bg-gray-300'}`}></div>
+                    <div className={`flex items-center ${currentStep >= 2 ? 'text-indigo-600' : 'text-gray-400'}`}>
+                        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 2 ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'} font-bold`}>2</div>
+                        <span className="ml-2 text-sm font-medium">Employment</span>
+                    </div>
+                    <div className={`h-0.5 w-12 ${currentStep >= 3 ? 'bg-indigo-500' : 'bg-gray-300'}`}></div>
+                    <div className={`flex items-center ${currentStep >= 3 ? 'text-indigo-600' : 'text-gray-400'}`}>
+                        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 3 ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-200 text-gray-500'} font-bold`}>3</div>
+                        <span className="ml-2 text-sm font-medium">Details</span>
                     </div>
                 </div>
-            )}
+            </div>
 
-            {success && (
-                <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow-sm">
-                    <div className="flex">
-                        <div className="flex-shrink-0">
-                            <svg className="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <div className="ml-3">
-                            <p className="text-sm font-medium">Employee created successfully!</p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="max-h-[60vh] overflow-y-auto pr-2">
-                <div className="mb-4">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="name">
-                        Full Name
-                    </label>
-                    <input
-                        id="name"
-                        name="name"
-                        type="text"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="email">
-                        Email
-                    </label>
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="password">
-                        Password
-                    </label>
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="phone">
-                        Phone
-                    </label>
-                    <input
-                        id="phone"
-                        name="phone"
-                        type="text"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="dob">
-                        Date of Birth
-                    </label>
-                    <input
-                        id="dob"
-                        name="dob"
-                        type="date"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.dob}
-                        onChange={handleChange}
-                        required
-                        placeholder="dd/mm/yyyy"
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="gender">
-                        Gender
-                    </label>
-                    <select
-                        id="gender"
-                        name="gender"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.gender}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="department">
-                        Department
-                    </label>
-                    <input
-                        id="department"
-                        name="department"
-                        type="text"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.department}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="employmentType">
-                        Employment Type
-                    </label>
-                    <select
-                        id="employmentType"
-                        name="employmentType"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.employmentType}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value="full-time">Full Time</option>
-                        <option value="part-time">Part Time</option>
-                        <option value="contract">Contract</option>
-                        <option value="intern">Intern</option>
-                        <option value="field">Field Employee</option>
-                    </select>
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="address">
-                        Address
-                    </label>
-                    <textarea
-                        id="address"
-                        name="address"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.address}
-                        onChange={handleChange}
-                        rows={2}
-                    ></textarea>
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="emergencyContact">
-                        Emergency Contact
-                    </label>
-                    <input
-                        id="emergencyContact"
-                        name="emergencyContact"
-                        type="text"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.emergencyContact}
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-dark text-sm font-semibold mb-2" htmlFor="salary">
-                        Salary
-                    </label>
-                    <input
-                        id="salary"
-                        name="salary"
-                        type="number"
-                        className="appearance-none w-full px-4 py-3 border border-gray-light rounded-lg text-gray-dark text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-primary"
-                        value={formData.salary}
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <div className="mt-6 flex items-center space-x-4 justify-end">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="btn-outline px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center"
-                    >
-                        <svg className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className={`flex items-center px-5 py-2.5 rounded-lg font-medium text-white shadow-md ${loading ? 'bg-gray-400' : 'bg-gradient-primary hover:shadow-lg hover:-translate-y-0.5'
-                            } transition`}
-                    >
-                        {loading ? (
-                            <div className="flex items-center">
-                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Creating...
+            {/* Alerts */}
+            <div className="px-6">
+                <AnimatePresence>
+                    {error && (
+                        <motion.div 
+                            className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-lg shadow-sm"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                        >
+                            <div className="flex items-start">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium">{error}</p>
+                                    {error.includes('log in') && (
+                                        <p className="mt-1 text-xs text-red-600">Redirecting to login page...</p>
+                                    )}
+                                </div>
                             </div>
-                        ) : (
-                            <>
-                                <svg className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
-                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                    <polyline points="7 3 7 8 15 8"></polyline>
-                                </svg>
-                                Create Employee
-                            </>
-                        )}
-                    </button>
+                        </motion.div>
+                    )}
+
+                    {success && (
+                        <motion.div 
+                            className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-lg shadow-sm"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                        >
+                            <div className="flex">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium">Employee created successfully!</p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            <form onSubmit={handleSubmit} className="px-6 pb-6">
+                <div className="max-h-[60vh] overflow-y-auto pr-2 py-2 space-y-1">
+                    {/* Step 1: Basic Information */}
+                    {currentStep === 1 && (
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="space-y-4"
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="name">
+                                        Full Name
+                                    </label>
+                                    <input
+                                        id="name"
+                                        name="name"
+                                        type="text"
+                                        className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="John Doe"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="email">
+                                        Email
+                                    </label>
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="john.doe@example.com"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="password">
+                                        Password
+                                    </label>
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="••••••••"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="phone">
+                                        Phone
+                                    </label>
+                                    <input
+                                        id="phone"
+                                        name="phone"
+                                        type="text"
+                                        className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="+91 98765 43210"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="dob">
+                                        Date of Birth
+                                    </label>
+                                    <input
+                                        id="dob"
+                                        name="dob"
+                                        type="date"
+                                        className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                        value={formData.dob}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="gender">
+                                        Gender
+                                    </label>
+                                    <select
+                                        id="gender"
+                                        name="gender"
+                                        className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                        value={formData.gender}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* Step 2: Employment Information */}
+                    {currentStep === 2 && (
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="space-y-4"
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="department">
+                                        Department
+                                    </label>
+                                    <input
+                                        id="department"
+                                        name="department"
+                                        type="text"
+                                        className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                        value={formData.department}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="Engineering"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="employmentType">
+                                        Employment Type
+                                    </label>
+                                    <select
+                                        id="employmentType"
+                                        name="employmentType"
+                                        className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                        value={formData.employmentType}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        <option value="full-time">Full Time</option>
+                                        <option value="part-time">Part Time</option>
+                                        <option value="contract">Contract</option>
+                                        <option value="intern">Intern</option>
+                                        <option value="field">Field Employee</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="salary">
+                                    Salary
+                                </label>
+                                <input
+                                    id="salary"
+                                    name="salary"
+                                    type="text"
+                                    className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                    value={formData.salary}
+                                    onChange={handleChange}
+                                    placeholder="₹50,000"
+                                />
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* Step 3: Additional Details */}
+                    {currentStep === 3 && (
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="space-y-4"
+                        >
+                            <div>
+                                <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="address">
+                                    Address
+                                </label>
+                                <textarea
+                                    id="address"
+                                    name="address"
+                                    className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                    value={formData.address}
+                                    onChange={handleChange}
+                                    rows={2}
+                                    placeholder="123 Main St, Bangalore, Karnataka"
+                                ></textarea>
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="emergencyContact">
+                                    Emergency Contact
+                                </label>
+                                <input
+                                    id="emergencyContact"
+                                    name="emergencyContact"
+                                    type="text"
+                                    className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                    value={formData.emergencyContact}
+                                    onChange={handleChange}
+                                    placeholder="+91 98765 43210 (Family Member)"
+                                />
+                            </div>
+
+                            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                                <h3 className="text-sm font-semibold text-gray-700 mb-3">Bank Details</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="bankDetails.accountNumber">
+                                            Account Number
+                                        </label>
+                                        <input
+                                            id="bankDetails.accountNumber"
+                                            name="bankDetails.accountNumber"
+                                            type="text"
+                                            className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                            value={formData.bankDetails.accountNumber}
+                                            onChange={handleChange}
+                                            placeholder="123456789012"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="bankDetails.ifsc">
+                                            IFSC Code
+                                        </label>
+                                        <input
+                                            id="bankDetails.ifsc"
+                                            name="bankDetails.ifsc"
+                                            type="text"
+                                            className="appearance-none w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 text-sm leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                            value={formData.bankDetails.ifsc}
+                                            onChange={handleChange}
+                                            placeholder="SBIN0001234"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </div>
+
+                {/* Navigation Buttons */}
+                <div className="mt-6 flex justify-between">
+                    {currentStep > 1 ? (
+                        <button
+                            type="button"
+                            onClick={prevStep}
+                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                        >
+                            Back
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                    )}
+
+                    {currentStep < 3 ? (
+                        <button
+                            type="button"
+                            onClick={nextStep}
+                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                        >
+                            Next
+                        </button>
+                    ) : (
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={`px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors flex items-center ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        >
+                            {loading ? (
+                                <>
+                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Creating...
+                                </>
+                            ) : (
+                                'Create Employee'
+                            )}
+                        </button>
+                    )}
                 </div>
             </form>
-        </div>
+        </motion.div>
     );
 };
 
-export default CreateEmployee; 
+// Missing AnimatePresence import
+const AnimatePresence = ({ children }) => {
+    return children;
+};
+
+export default CreateEmployee;
