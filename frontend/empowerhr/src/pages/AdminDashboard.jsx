@@ -192,15 +192,19 @@ const AdminDashboard = () => {
     };
 
     const handleLogout = () => {
-        // Clear cookies
-        Cookies.remove('token');
-        Cookies.remove('userRole');
-        Cookies.remove('userData');
+       Cookies.remove('token');
+    Cookies.remove('userRole');
+    Cookies.remove('userData');
 
-        // Don't remove deviceId from localStorage to maintain device recognition
-        console.log('Admin logging out - deviceId preserved for future employee login');
+    // Remove all auth/user data from localStorage except deviceId
+    const deviceId = localStorage.getItem('deviceId');
+    localStorage.clear();
+    if (deviceId) {
+        localStorage.setItem('deviceId', deviceId);
+    }
 
-        navigate('/login');
+    console.log('User logged out. deviceId preserved for future logins.');
+    navigate('/login');
     };
 
     // Add this new function to verify authentication
