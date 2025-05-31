@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AdminDashboard from "./pages/AdminDashboard";
+import Attendance from "./pages/Attendance";
+import Leave from "./pages/Leave";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -41,8 +43,11 @@ function App() {
           element={
             isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" replace />
           }
+          
         />
 
+      <Route path="/attendance" element={<Attendance/>} />
+      <Route path="/leave" element={<Leave/>} />
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

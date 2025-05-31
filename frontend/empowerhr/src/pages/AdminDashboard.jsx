@@ -3,8 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import CreateEmployee from '../components/CreateEmployee';
 import { authenticatedFetch, parseJsonResponse, resetEmployeeDevice } from '../utils/api';
-import AttendanceList from './Attendance';
-import { FiCheckCircle, FiPlus,  FiClipboard } from 'react-icons/fi';
+// import AttendanceList from './Attendance';
+// import LeaveList from './Leave';
+import { FiLogOut, FiUserPlus, FiCalendar, FiEye, FiRefreshCw, FiCheckCircle, FiPlus,  FiClipboard } from 'react-icons/fi';
 import TaskForm from '../components/TaskForm';
 import { motion, AnimatePresence } from 'framer-motion';
 // Mock data function for fallback
@@ -60,12 +61,12 @@ const AdminDashboard = () => {
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [adminId, setAdminId] = useState(null);
 
-    const handleClick = () => {
-        navigate('/attendance');
-    };
-    const handleLeaveClick = () => {
-        navigate('/attendance');
-    };
+  const handleClick = () => {
+    navigate('/attendance');
+};
+const handleLeaveClick = () => {
+    navigate('/leave');
+};
 
     useEffect(() => {
         // Check if user is logged in and is admin
@@ -193,18 +194,18 @@ const AdminDashboard = () => {
 
     const handleLogout = () => {
        Cookies.remove('token');
-    Cookies.remove('userRole');
-    Cookies.remove('userData');
+        Cookies.remove('userRole');
+        Cookies.remove('userData');
 
     // Remove all auth/user data from localStorage except deviceId
-    const deviceId = localStorage.getItem('deviceId');
-    localStorage.clear();
-    if (deviceId) {
-        localStorage.setItem('deviceId', deviceId);
-    }
+        const deviceId = localStorage.getItem('deviceId');
+        localStorage.clear();
+        if (deviceId) {
+            localStorage.setItem('deviceId', deviceId);
+        }
 
-    console.log('User logged out. deviceId preserved for future logins.');
-    navigate('/login');
+        console.log('User logged out. deviceId preserved for future logins.');
+        navigate('/login');
     };
 
     // Add this new function to verify authentication
@@ -373,41 +374,80 @@ const AdminDashboard = () => {
       </AnimatePresence>
 
       {/* Dashboard Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          className="bg-white rounded-xl shadow flex items-center p-6 cursor-pointer"
-          onClick={openCreateEmployeeModal}
-        >
-          <FiPlus className="text-indigo-600 text-3xl mr-4" />
-          <div>
-            <div className="text-lg font-semibold">Add Employee</div>
-            <div className="text-sm text-gray-500">Create a new employee record</div>
-          </div>
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          className="bg-white rounded-xl shadow flex items-center p-6 cursor-pointer"
-          onClick={() => setShowTaskModal(true)}
-        >
-          <FiClipboard className="text-green-600 text-3xl mr-4" />
-          <div>
-            <div className="text-lg font-semibold">All Tasks</div>
-            <div className="text-sm text-gray-500">Assign or view tasks</div>
-          </div>
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          className="bg-white rounded-xl shadow flex items-center p-6 cursor-pointer"
-          onClick={handleClick}
-        >
-          <FiCheckCircle className="text-yellow-500 text-3xl mr-4" />
-          <div>
-            <div className="text-lg font-semibold">Attendance / Leave</div>
-            <div className="text-sm text-gray-500">View attendance & leave</div>
-          </div>
-        </motion.div>
+      {/* Quick Actions Grid (Improved) */}
+<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 px-4 sm:px-0">
+  {/* Add Employee Card */}
+  <motion.div
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    className="bg-gradient-to-br from-indigo-600 to-blue-500 text-white rounded-xl shadow-lg cursor-pointer"
+    onClick={openCreateEmployeeModal}
+  >
+    <div className="p-6 flex items-center">
+      <div className="bg-white/10 p-3 rounded-lg">
+        <FiUserPlus className="text-2xl" />
       </div>
+      <div className="ml-4">
+        <h3 className="text-lg font-semibold">Add Employee</h3>
+        <p className="text-sm opacity-90">Register new team member</p>
+      </div>
+    </div>
+  </motion.div>
+
+  {/* Tasks Card */}
+  <motion.div
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    className="bg-gradient-to-br from-green-600 to-emerald-500 text-white rounded-xl shadow-lg cursor-pointer"
+    onClick={() => setShowTaskModal(true)}
+  >
+    <div className="p-6 flex items-center">
+      <div className="bg-white/10 p-3 rounded-lg">
+        <FiClipboard className="text-2xl" />
+      </div>
+      <div className="ml-4">
+        <h3 className="text-lg font-semibold">Tasks</h3>
+        <p className="text-sm opacity-90">Manage assignments</p>
+      </div>
+    </div>
+  </motion.div>
+
+  {/* Attendance Card */}
+  <motion.div
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    className="bg-gradient-to-br from-amber-500 to-orange-400 text-white rounded-xl shadow-lg cursor-pointer"
+    onClick={() => navigate('/attendance')}
+  >
+    <div className="p-6 flex items-center">
+      <div className="bg-white/10 p-3 rounded-lg">
+        <FiCheckCircle className="text-2xl" />
+      </div>
+      <div className="ml-4">
+        <h3 className="text-lg font-semibold">Attendance</h3>
+        <p className="text-sm opacity-90">View records</p>
+      </div>
+    </div>
+  </motion.div>
+
+  {/* Leave Card */}
+  <motion.div
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    className="bg-gradient-to-br from-purple-600 to-fuchsia-500 text-white rounded-xl shadow-lg cursor-pointer"
+    onClick={() => navigate('/leave')}
+  >
+    <div className="p-6 flex items-center">
+      <div className="bg-white/10 p-3 rounded-lg">
+        <FiCalendar className="text-2xl" />
+      </div>
+      <div className="ml-4">
+        <h3 className="text-lg font-semibold">Leave</h3>
+        <p className="text-sm opacity-90">Manage requests</p>
+      </div>
+    </div>
+  </motion.div>
+</div>
 
       {/* Employee Management Table */}
       <motion.div
@@ -466,7 +506,6 @@ const AdminDashboard = () => {
                 <tr className="bg-indigo-50">
                   <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">Name</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">Department</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">Status</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">Phone</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">Type</th>
@@ -486,7 +525,6 @@ const AdminDashboard = () => {
                     >
                       <td className="px-4 py-3 font-medium">{employee.name}</td>
                       <td className="px-4 py-3">{employee.email}</td>
-                      <td className="px-4 py-3">{employee.department}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${employee.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
                           {employee.status}
@@ -494,20 +532,49 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-4 py-3">{employee.phone}</td>
                       <td className="px-4 py-3">{employee.employmentType}</td>
-                      <td className="px-4 py-3 flex gap-2">
-                        <button
-                          onClick={() => handleViewEmployee(employee)}
-                          className="text-indigo-600 hover:text-indigo-900 font-semibold text-xs"
-                        >
-                          View
-                        </button>
-                        <button
-                          onClick={() => openResetDeviceModal(employee)}
-                          className="text-red-500 hover:text-red-700 font-semibold text-xs"
-                        >
-                          Reset Device
-                        </button>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2 items-center bg-white/60 backdrop-blur rounded-xl shadow-lg px-2 py-1">
+                          {/* View Button */}
+                          <button
+                            onClick={() => handleViewEmployee(employee)}
+                            className="cursor-pointer flex items-center justify-center w-9 h-9 rounded-full bg-indigo-100 hover:bg-indigo-600 transition-colors shadow
+                              hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 group"
+                            aria-label="View"
+                            type="button"
+                          >
+                            <svg
+                              className="w-5 h-5 text-indigo-600 group-hover:text-white transition-colors"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                          </button>
+                          {/* Reset Device Button */}
+                          <button
+                            onClick={() => openResetDeviceModal(employee)}
+                            className="cursor-pointer flex items-center justify-center w-9 h-9 rounded-full bg-red-100 hover:bg-red-600 transition-colors shadow
+                              hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-400 group"
+                            aria-label="Reset Device"
+                            type="button"
+                          >
+                            <svg
+                              className="w-5 h-5 text-red-600 group-hover:text-white transition-colors"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M4.93 4.93a10 10 0 1 1 0 14.14M4.93 19.07L4.93 14.14M4.93 19.07H9.86" />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
+
+
                     </motion.tr>
                   ))}
                 </AnimatePresence>
