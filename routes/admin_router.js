@@ -8,6 +8,7 @@ const { resetDeviceId } = require("../controller/admin/reset_device_id_controlle
 router.post("/signup", adminSignup);
 router.post("/login", adminLogin);
 router.get("/logout", adminLogout);
+router.get("/location", isloginMiddleware, roleMiddleware(["admin", "hr", "user"]), getLocation);
 router.patch("/:id/reset-device", isloginMiddleware, roleMiddleware(["admin", "hr"]), resetDeviceId);
 router.patch("/location", isloginMiddleware, roleMiddleware(["admin", "hr"]), updateLocation);
 

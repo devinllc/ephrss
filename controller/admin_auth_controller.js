@@ -89,3 +89,18 @@ module.exports.updateLocation = async (req, res) => {
         res.status(500).json({ error: "Internal server error." });
     }
 };
+
+module.exports.getLocation = async (req, res) => {
+    try {
+        const adminId = req.user.role === 'admin' ? req.user._id : req.user.adminId;
+        const targetAdmin = await admin_model.findById(adminId);
+        
+        if (!targetAdmin) {
+            return res.status(404).json({ error: "Admin configuration not found." });
+        }
+        res.status(200).json({ location: targetAdmin.location });
+    } catch (err) {
+        console.error("Error fetching location:", err);
+        res.status(500).json({ error: "Internal server error." });
+    }
+};
