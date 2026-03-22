@@ -44,9 +44,17 @@ exports.getTasks = async (req, res) => {
 // ✅ Get Single Task
 exports.getTaskById = async (req, res) => {
   try {
-      const task = await Task.find({ assignedTo: req.params.id }).populate("assignedTo");
-    if (!task) return res.status(404).json({ error: "Task not found" });
-    res.json(task);
+    let targetId = req.params.id;
+
+    // If targetId is an email, find the employee first
+    if (targetId.includes("@")) {
+      const employee = await require("../model/employee_model").findOne({ email: targetId });
+      if (!employee) return res.status(404).json({ error: "Employee not found with this email" });
+      targetId = employee._id;
+    }
+
+    const tasks = await Task.find({ assignedTo: targetId }).populate("assignedTo");
+    res.json(tasks);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

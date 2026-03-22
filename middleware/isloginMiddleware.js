@@ -1,6 +1,6 @@
-// middleware/authMiddleware.js
 const jwt = require("jsonwebtoken");
 const admin_model = require("../model/admin_model");
+const employee_model = require("../model/employee_model");
 
 const extractToken = (req) => {
     if (req.headers.authorization?.startsWith("Bearer ")) {
@@ -31,11 +31,21 @@ module.exports = async (req, res, next) => {
 
     try {
         const decoded = await verifyToken(token);
+        console.log("Decoded Token:", decoded);
 
-        const user = await admin_model.findOne({ email: decoded.email }).select("-password");
+        // Try to find in admin_model first
+        let user = await admin_model.findOne({ email: decoded.email }).select("-password");
+        console.log("Admin found:", user ? "YES" : "NO");
+
+        // If not found in admin, try employee_model
+        if (!user) {
+            user = await employee_model.findOne({ email: decoded.email }).select("-password");
+            console.log("Employee found:", user ? "YES" : "NO");
+        }
 
         if (!user) {
-            return res.status(403).json({ error: "Access denied: Not Permitted" });
+            console.log("Access Denied for email:", decoded.email);
+            return res.status(403).json({ error: "Access denied: User not found or Not Permitted" });
         }
 
         req.user = user;
