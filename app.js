@@ -10,6 +10,10 @@ const attendanceRouter = require("./routes/attendence_router");
 const leaveRouter = require("./routes/leave_router");
 const payroleRouter = require("./routes/payrole_router");
 const taskRouter = require("./routes/task_routes");
+const projectRouter = require("./routes/project_router");
+const deviceLoginRouter = require("./routes/device_login_router");
+const performanceRouter = require("./routes/performance_router");
+const subscriptionRouter = require("./routes/subscription_router");
 const cors = require('cors');
 const db = require("./config/mongoose_connection");
 const admin_model = require("./model/admin_model");
@@ -29,8 +33,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Configure CORS
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001','https://servs.ufdevs.me', 'http://localhost:5174', 'http://localhost:5173','https://servs.ufdevs.me/login','https://ufdevs.me'],
-    credentials: true,  
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'https://servs.ufdevs.me', 'http://localhost:5174', 'http://localhost:5173', 'https://servs.ufdevs.me/login', 'https://ufdevs.me', 'https://ephrssfrontend.vercel.app'],
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
 }));
 
@@ -58,13 +62,17 @@ app.use("/admin", adminRouter);
 app.use("/attendence", attendanceRouter);
 app.use("/leave", leaveRouter);
 app.use("/payrole", payroleRouter);
+app.use("/projects", projectRouter);
 app.use("/task", taskRouter);
+app.use("/saved-logins", deviceLoginRouter);
+app.use("/performance", performanceRouter);
+app.use("/subscription", subscriptionRouter);
 
 // app.listen(3000);// ✅ Only start server if not on Vercel
 if (process.env.NODE_ENV !== 'production') {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+        console.log(`🚀 Server running on http://localhost:${PORT}`);
     });
-  }
+}
 module.exports = app;

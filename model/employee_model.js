@@ -56,6 +56,11 @@ const employeeSchema = new mongoose.Schema({
     type: String,
     default: "" 
   },
+  documents: [{
+    docName: String,
+    url: String,
+    uploadedAt: { type: Date, default: Date.now }
+  }],
   status: {
     type: String,
     enum: ["active", "inactive", "terminated", "on-leave"],

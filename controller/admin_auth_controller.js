@@ -68,5 +68,24 @@ module.exports.adminLogout = async (req, res) => {
         sameSite: 'None'
     });
     res.status(200).json({ message: "Logout successful" });
-
 }
+
+module.exports.updateLocation = async (req, res) => {
+    try {
+        const { latitude, longitude, radiusInMeters } = req.body;
+        
+        const updatedAdmin = await admin_model.findByIdAndUpdate(
+            req.user._id, 
+            { location: { latitude, longitude, radiusInMeters } },
+            { new: true }
+        );
+        
+        if (!updatedAdmin) {
+            return res.status(404).json({ error: "Admin not found." });
+        }
+        res.status(200).json({ message: "Location configuration updated successfully.", location: updatedAdmin.location });
+    } catch (err) {
+        console.error("Error updating location:", err);
+        res.status(500).json({ error: "Internal server error." });
+    }
+};

@@ -26,8 +26,13 @@ const taskSchema = new mongoose.Schema({
 
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Admin",
+    refPath: 'creatorModel',
     required: true
+  },
+  creatorModel: {
+    type: String,
+    enum: ['Admin', 'Employee'],
+    default: 'Admin'
   },
 
   projectId: {
