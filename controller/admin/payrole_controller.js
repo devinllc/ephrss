@@ -59,8 +59,20 @@ module.exports.generatePayroll = async (req, res) => {
         const perDaySalary = basicSalary / totalWorkingDays;
         const adjustedBasicSalary = perDaySalary * paidDays;
 
+        // Add standard deduction logic (Tax, PF)
+        const professionalTax = adjustedBasicSalary > 10000 ? 200 : 0;
+        const providendFund = adjustedBasicSalary * 0.12; // 12% PF
+        
         const totalAllowances = allowances.reduce((sum, item) => sum + (item.amount || 0), 0);
-        const totalDeductions = deductions.reduce((sum, item) => sum + (item.amount || 0), 0);
+        
+        // Combine manual deductions with calculated ones
+        const calculatedDeductions = [
+          ...deductions,
+          { name: "Professional Tax", amount: professionalTax },
+          { name: "PF (Employee Share)", amount: providendFund }
+        ];
+
+        const totalDeductions = calculatedDeductions.reduce((sum, item) => sum + (item.amount || 0), 0);
 
         const grossSalary = adjustedBasicSalary + totalAllowances;
         const netSalary = grossSalary - totalDeductions;
@@ -74,7 +86,7 @@ module.exports.generatePayroll = async (req, res) => {
             daysLeaveApproved,
             basicSalary,
             allowances,
-            deductions,
+            deductions: calculatedDeductions,
             grossSalary,
             totalDeductions,
             netSalary

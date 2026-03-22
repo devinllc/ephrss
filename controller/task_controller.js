@@ -8,10 +8,30 @@ require("../model/admin_model");    // ✅ this will register "Admin" schema
 // ✅ Create Task
 exports.createTask = async (req, res) => {
   try {
-    const task = new Task(req.body);
+    const taskData = { ...req.body };
+
+    // Automatically set creator from session/token user if not provided
+    if (!taskData.createdBy && req.user) {
+      taskData.createdBy = req.user._id;
+      // Determine model based on role (default to Admin if not sure)
+      taskData.creatorModel = req.user.role === 'employee' ? 'Employee' : 'Admin';
+    }
+
+    const task = new Task(taskData);
     await task.save();
+
+    // If task was created within a project, we might want to update the project's task list
+    // though the Task model has a projectId ref, the Project model also has 'tasks' array.
+    if (task.projectId) {
+      await require("../model/project_model").findByIdAndUpdate(
+        task.projectId,
+        { $push: { tasks: task._id } }
+      );
+    }
+
     res.status(201).json(task);
   } catch (err) {
+    console.error("Error creating task:", err);
     res.status(400).json({ error: err.message });
   }
 };

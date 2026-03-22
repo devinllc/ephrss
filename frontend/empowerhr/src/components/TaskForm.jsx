@@ -3,7 +3,7 @@ import { authenticatedFetch, parseJsonResponse } from '../utils/api';
 import { FiX, FiUser, FiCalendar, FiTag } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 
-const TaskForm = ({ onSubmit, onClose, initialData = null, adminId = null }) => {
+const TaskForm = ({ onTaskCreated, onClose, initialData = null, adminId = null }) => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -87,7 +87,7 @@ const TaskForm = ({ onSubmit, onClose, initialData = null, adminId = null }) => 
         setLoading(true);
         setError('');
         try {
-            await onSubmit(formData);
+            await onTaskCreated(formData);
             onClose();
         } catch (err) {
             setError(err.message || 'Failed to save task');

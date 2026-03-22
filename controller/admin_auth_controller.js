@@ -45,18 +45,14 @@ module.exports.adminLogin = async (req, res) => {
     let { email, password } = req.body;
     let admin = await admin_model.findOne({ email: email });
     if (!admin) return res.status(400).send("SOMETHING IS INCORRECT");
-    bcrypt.compare(password, admin.password, (err, result) => {
-        if (result) {
-            let token = generateToken(admin);
-            res.cookie('token', token);
-            res.status(200).json({
-                message: "admin login successfully",
-                token
-            });
-        }
-        else {
-            return res.status(400).send("SOMETHING IS INCORRECT");
-        }
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
+
+    const token = generateToken(admin);
+    res.cookie('token', token);
+    res.status(200).json({
+        message: "admin login successfully",
+        token
     });
 };
 
@@ -102,5 +98,31 @@ module.exports.getLocation = async (req, res) => {
     } catch (err) {
         console.error("Error fetching location:", err);
         res.status(500).json({ error: "Internal server error." });
+    }
+};
+
+module.exports.updateCompanyProfile = async (req, res) => {
+    try {
+        const { companyName, contactNumber, address, workingHours, companyLogo } = req.body;
+        
+        const updatedAdmin = await admin_model.findByIdAndUpdate(
+            req.user._id,
+            { $set: { companyName, contactNumber, address, workingHours, companyLogo } },
+            { new: true }
+        ).select("-password");
+
+        res.status(200).json({ message: "Company profile updated", admin: updatedAdmin });
+    } catch (err) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+module.exports.getSettings = async (req, res) => {
+    try {
+        const adminId = req.user.role === 'admin' ? req.user._id : req.user.adminId;
+        const admin = await admin_model.findById(adminId).select("-password");
+        res.status(200).json({ settings: admin });
+    } catch (err) {
+        res.status(500).json({ error: "Internal server error" });
     }
 };

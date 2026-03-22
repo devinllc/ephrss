@@ -2,17 +2,30 @@ const Performance = require("../model/performance_model");
 
 exports.createReview = async (req, res) => {
   try {
-    const { employeeId, reviewPeriod, rating, feedback, goalsAchieved, areasOfImprovement } = req.body;
+    const { 
+      employeeId, 
+      reviewPeriod, 
+      rating, 
+      feedback, 
+      goalsAchieved, 
+      areasOfImprovement,
+      technicalRating,
+      behavioralRating,
+      punctualityRating
+    } = req.body;
     const evaluator = req.user._id;
 
     const review = await Performance.create({
       employee: employeeId,
       evaluator,
       reviewPeriod,
-      rating,
+      rating: rating || (technicalRating + behavioralRating + punctualityRating) / 3,
       feedback,
       goalsAchieved,
-      areasOfImprovement
+      areasOfImprovement,
+      technicalRating,
+      behavioralRating,
+      punctualityRating
     });
 
     res.status(201).json({ message: "Performance review created", review });

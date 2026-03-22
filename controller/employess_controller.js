@@ -53,20 +53,15 @@ module.exports.employeeLogin = async (req, res) => {
         employee.deviceId = deviceId;
         await employee.save();
     }
-    bcrypt.compare(password, employee.password, (err, result) => {
-        if (result) {
+    const isMatch = await bcrypt.compare(password, employee.password);
+    if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
 
-            const token = generateToken(employee);
-            res.cookie('token', token);
-            res.status(201).json({
-                message: "User login successfully",
-                token
-            });
-        } else {
-            return res.status(200).send("SOMETHING IS INCORRECT");
-        };
-
-    })
+    const token = generateToken(employee);
+    res.cookie('token', token);
+    res.status(200).json({
+        message: "User login successfully",
+        token
+    });
 };
 
 module.exports.getProfile = async (req, res) => {
@@ -98,4 +93,55 @@ module.exports.employeeLogout = async (req, res) => {
         sameSite: 'None'
     });
     res.status(200).json({ message: "Logout successful" });
+};
+
+module.exports.uploadDocument = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded." });
+        }
+        
+        const { docName } = req.body;
+        const employeeId = req.user._id;
+
+        // Mock URL for now (since we don't have S3)
+        const fileUrl = `/uploads/${req.file.filename}`;
+
+        const employee = await emplyees_model.findByIdAndUpdate(
+            employeeId,
+            { 
+                $push: { 
+                    documents: { 
+                        docName: docName || req.file.originalname, 
+                        url: fileUrl 
+                    } 
+                } 
+            },
+            { new: true }
+        );
+
+        res.status(201).json({ message: "Document uploaded successfully", document: employee.documents.slice(-1)[0] });
+    } catch (err) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+module.exports.updateOnboardingStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        if (!["pending", "in-progress", "completed"].includes(status)) {
+            return res.status(400).json({ error: "Invalid status." });
+        }
+
+        const employeeId = req.params.id || req.user._id;
+        const employee = await emplyees_model.findByIdAndUpdate(
+            employeeId,
+            { onboardingStatus: status },
+            { new: true }
+        );
+
+        res.status(200).json({ message: "Onboarding status updated", onboardingStatus: employee.onboardingStatus });
+    } catch (err) {
+        res.status(500).json({ error: "Internal server error" });
+    }
 };

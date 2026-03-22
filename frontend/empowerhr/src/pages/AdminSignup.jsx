@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../utils/api';
 
 const AdminSignup = () => {
     const [formData, setFormData] = useState({
@@ -28,7 +29,7 @@ const AdminSignup = () => {
         try {
             console.log('Submitting admin signup with data:', formData);
 
-            const response = await fetch('http://localhost:3000/admin/signup', {
+            const response = await fetch(`${API_BASE_URL}/admin/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

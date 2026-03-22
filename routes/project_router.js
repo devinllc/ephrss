@@ -13,5 +13,6 @@ router.delete("/:id", roleMiddleware(["admin", "hr"]), projectController.deleteP
 
 // All users can fetch assigned projects mapping
 router.get("/", projectController.getProjects);
+router.get("/:id", projectController.getProjectById);
 
 module.exports = router;

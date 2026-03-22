@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Cookies from 'js-cookie';
 import { motion } from 'framer-motion';
+import { authenticatedFetch } from '../utils/api';
 
 const CreateEmployee = ({ onClose, onEmployeeCreated }) => {
     const [formData, setFormData] = useState({
@@ -33,13 +34,9 @@ const CreateEmployee = ({ onClose, onEmployeeCreated }) => {
             Cookies.set('token', token, { expires: 1 });
 
             // Import authenticatedFetch (assuming it exists, otherwise just use fetch pointing explicitly config)
-            const response = await fetch('http://localhost:3000/employees/create', {
+            // Use authenticatedFetch instead of hardcoded localhost
+            const response = await authenticatedFetch('/employees/create', {
                 method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
                 body: JSON.stringify({ ...formData, token })
             });
 

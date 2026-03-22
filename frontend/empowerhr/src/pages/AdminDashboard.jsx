@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import CreateEmployee from '../components/CreateEmployee';
-import { authenticatedFetch, parseJsonResponse, resetEmployeeDevice } from '../utils/api';
+import { authenticatedFetch, parseJsonResponse, resetEmployeeDevice, API_BASE_URL } from '../utils/api';
 // import AttendanceList from './Attendance';
 // import LeaveList from './Leave';
 import { FiLogOut, FiUserPlus, FiCalendar, FiEye, FiRefreshCw, FiCheckCircle, FiPlus,  FiClipboard } from 'react-icons/fi';
@@ -296,13 +296,8 @@ const handleLeaveClick = () => {
 
     const handleCreateTask = async (taskData) => {
         try {
-            const response = await fetch('http://localhost:3000/task/', {
+            const response = await authenticatedFetch('/task/', {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${Cookies.get('token')}`
-                },
-                credentials: 'include',
                 body: JSON.stringify({
                     ...taskData,
                     createdBy: adminId,

@@ -11,10 +11,13 @@ router.post("/login", employeeLogin);
 router.get("/profile", isloginMiddleware, require("../controller/employess_controller").getProfile);
 router.put("/profile", isloginMiddleware, require("../controller/employess_controller").updateProfile);
 router.get("/logout", employeeLogout);
-router.get("/alls", getAllEmployees);
-router.get("/all", getAllEmployeess);
+router.get("/alls", isloginMiddleware, roleMiddleware(["admin", "hr"]), getAllEmployees);
+router.get("/all", isloginMiddleware, roleMiddleware(["admin", "hr"]), getAllEmployeess);
 
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
-
+router.post("/upload-document", isloginMiddleware, upload.single("document"), require("../controller/employess_controller").uploadDocument);
+router.patch("/onboarding{/:id}", isloginMiddleware, require("../controller/employess_controller").updateOnboardingStatus);
 
 module.exports = router;

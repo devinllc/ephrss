@@ -51,3 +51,17 @@ exports.deleteProject = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+// Get a single project by ID
+exports.getProjectById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const project = await Project.findById(id).populate('tasks');
+
+    if (!project) return res.status(404).json({ error: "Project not found" });
+
+    res.status(200).json({ project });
+  } catch (error) {
+    console.error("Error fetching project:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

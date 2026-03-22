@@ -14,6 +14,7 @@ const projectRouter = require("./routes/project_router");
 const deviceLoginRouter = require("./routes/device_login_router");
 const performanceRouter = require("./routes/performance_router");
 const subscriptionRouter = require("./routes/subscription_router");
+const insightsRouter = require("./routes/insights_router");
 const cors = require('cors');
 const db = require("./config/mongoose_connection");
 const admin_model = require("./model/admin_model");
@@ -67,6 +68,7 @@ app.use("/task", taskRouter);
 app.use("/saved-logins", deviceLoginRouter);
 app.use("/performance", performanceRouter);
 app.use("/subscription", subscriptionRouter);
+app.use("/insights", insightsRouter);
 
 // app.listen(3000);// ✅ Only start server if not on Vercel
 if (process.env.NODE_ENV !== 'production') {

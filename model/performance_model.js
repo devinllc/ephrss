@@ -21,6 +21,10 @@ const performanceSchema = new mongoose.Schema({
     max: 5,
     required: true
   },
+  technicalRating: { type: Number, min: 1, max: 5 },
+  behavioralRating: { type: Number, min: 1, max: 5 },
+  punctualityRating: { type: Number, min: 1, max: 5 },
+
   feedback: {
     type: String,
     required: true

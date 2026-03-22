@@ -11,5 +11,7 @@ router.get("/logout", adminLogout);
 router.get("/location", isloginMiddleware, roleMiddleware(["admin", "hr", "employee", "user"]), getLocation);
 router.patch("/:id/reset-device", isloginMiddleware, roleMiddleware(["admin", "hr"]), resetDeviceId);
 router.patch("/location", isloginMiddleware, roleMiddleware(["admin", "hr"]), updateLocation);
+router.get("/settings", isloginMiddleware, roleMiddleware(["admin", "hr", "employee"]), require("../controller/admin_auth_controller").getSettings);
+router.patch("/profile", isloginMiddleware, roleMiddleware(["admin", "hr"]), require("../controller/admin_auth_controller").updateCompanyProfile);
 
 module.exports = router;

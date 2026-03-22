@@ -67,6 +67,19 @@ const adminSchema = new mongoose.Schema({
       default: 300, 
     },
   },
+  workingHours: {
+    start: { type: String, default: "09:00" },
+    end: { type: String, default: "18:00" },
+    workingDays: { type: [String], default: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] }
+  },
+  companyLogo: {
+    type: String,
+    default: ""
+  },
+  notificationSettings: {
+    email: { type: Boolean, default: true },
+    push: { type: Boolean, default: true }
+  },
   subscription: {
     status: {
       type: String,
