@@ -67,8 +67,29 @@ module.exports.employeeLogin = async (req, res) => {
         };
 
     })
-
 };
+
+module.exports.getProfile = async (req, res) => {
+    try {
+        res.status(200).json({ employee: req.user });
+    } catch (err) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+module.exports.updateProfile = async (req, res) => {
+    try {
+        const updatedEmployee = await emplyees_model.findByIdAndUpdate(
+            req.user._id,
+            { $set: req.body },
+            { new: true }
+        );
+        res.status(200).json({ message: "Profile updated successfully", employee: updatedEmployee });
+    } catch (err) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 module.exports.employeeLogout = async (req, res) => {
     res.cookie("token", "");
     res.clearCookie('token', {

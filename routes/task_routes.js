@@ -5,6 +5,7 @@ const taskController = require("../controller/task_controller");
 // CRUD
 router.post("/", taskController.createTask);
 router.get("/", taskController.getTasks); // supports filter/search
+router.get("/user/:id", taskController.getTaskById); // get tasks by user ID
 router.get("/:id", taskController.getTaskById);
 router.put("/:id", taskController.updateTask);
 router.delete("/:id", taskController.deleteTask);

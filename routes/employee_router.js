@@ -8,6 +8,8 @@ const { getAllEmployees, getAllEmployeess } = require("../controller/admin/get_a
 
 router.post("/create", isloginMiddleware, roleMiddleware(["admin", "hr"]), planMiddleware(['basic', 'pro', 'enterprise']), createEmployees);
 router.post("/login", employeeLogin);
+router.get("/profile", isloginMiddleware, require("../controller/employess_controller").getProfile);
+router.put("/profile", isloginMiddleware, require("../controller/employess_controller").updateProfile);
 router.get("/logout", employeeLogout);
 router.get("/alls", getAllEmployees);
 router.get("/all", getAllEmployeess);
