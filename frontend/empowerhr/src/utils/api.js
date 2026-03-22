@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 
 // Define a base URL that uses the actual backend URL in both development and production
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'https://ephrssbackend.vercel.app';
 
 /**
  * Parse JSON response with enhanced error handling
@@ -53,7 +53,7 @@ function ensureTokenInCookies() {
  */
 export const authenticatedFetch = async (endpoint, options = {}) => {
     const token = localStorage.getItem('token') || Cookies.get('token');
-    
+
     // Default headers for all requests
     const headers = {
         'Content-Type': 'application/json',
@@ -73,14 +73,14 @@ export const authenticatedFetch = async (endpoint, options = {}) => {
     // Add token as query parameter for specific endpoints
     const tokenEndpoints = ['/task/', '/attendence/', '/employees/'];
     const shouldAddTokenToQuery = tokenEndpoints.some(ep => endpoint.startsWith(ep));
-    
-    const finalUrl = shouldAddTokenToQuery && token 
+
+    const finalUrl = shouldAddTokenToQuery && token
         ? `${url}${url.includes('?') ? '&' : '?'}token=${token}`
         : url;
 
     try {
         console.log(`Fetching from ${finalUrl} with options:`, { credentials: 'include', headers });
-        
+
         const response = await fetch(finalUrl, {
             ...options,
             headers,
@@ -96,7 +96,7 @@ export const authenticatedFetch = async (endpoint, options = {}) => {
         // Check if the response is JSON
         const contentType = response.headers.get('content-type');
         console.log('Response content type:', contentType);
-        
+
         if (contentType && contentType.includes('application/json')) {
             return response;
         }
@@ -248,7 +248,7 @@ export async function loginEmployee(email, password, deviceId) {
         // Store token if available in the response
         if (data.token) {
             // Set token in Cookie with appropriate attributes
-            Cookies.set('token', data.token, { 
+            Cookies.set('token', data.token, {
                 expires: 7,
                 path: '/',
                 sameSite: 'none',
@@ -260,7 +260,7 @@ export async function loginEmployee(email, password, deviceId) {
             document.cookie = `token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=None; ${window.location.protocol === 'https:' ? 'Secure' : ''}`;
 
             // Store user role and data
-            Cookies.set('userRole', 'employee', { 
+            Cookies.set('userRole', 'employee', {
                 expires: 7,
                 path: '/',
                 sameSite: 'none',
@@ -268,7 +268,7 @@ export async function loginEmployee(email, password, deviceId) {
             });
             const userData = data.employee || {};
             localStorage.setItem('userData', JSON.stringify(userData));
-            Cookies.set('userData', JSON.stringify(userData), { 
+            Cookies.set('userData', JSON.stringify(userData), {
                 expires: 7,
                 path: '/',
                 sameSite: 'none',
@@ -405,7 +405,7 @@ export const createTask = async (taskData) => {
     try {
         // Get token from localStorage or cookies
         const token = localStorage.getItem('token') || Cookies.get('token');
-        
+
         const response = await fetch(`${API_BASE_URL}/task/`, {
             method: 'POST',
             headers: {
