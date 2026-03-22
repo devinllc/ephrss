@@ -1,17 +1,5 @@
-/Users/rameshvishwakarma/fp/ephrss/routes/admin_router.js:11
-router.get("/location", isloginMiddleware, roleMiddleware(["admin", "hr", "user"]), getLocation);
-                                                                                    ^
-
-ReferenceError: getLocation is not defined
-    at Object.<anonymous> (/Users/rameshvishwakarma/fp/ephrss/routes/admin_router.js:11:85)
-    at Module._compile (node:internal/modules/cjs/loader:1521:14)
-    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
-    at Module.load (node:internal/modules/cjs/loader:1266:32)
-    at Module._load (node:internal/modules/cjs/loader:1091:12)
-    at Module.require (node:internal/modules/cjs/loader:1289:19)
-    at require (node:internal/modules/helpers:182:18)
-    at Object.<anonymous> (/Users/rameshvishwakarma/fp/ephrss/app.js:7:21)
-    at Module._compile (node:internal/modules/cjs/loader:1521:14)
-    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
-
-Node.js v20.20.0
+Connecting to: mongodb+srv://incrypto09:VcFzmdvSgSbqHx5m@transcoding.jcngo.mongodb.net/empowerhrstest?retryWrites=true&w=majority&appName=transcoding
+(node:79884) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79884) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+🚀 Server running on http://localhost:3000
