@@ -14,8 +14,11 @@ router.get("/logout", employeeLogout);
 router.get("/alls", isloginMiddleware, roleMiddleware(["admin", "hr"]), getAllEmployees);
 router.get("/all", isloginMiddleware, roleMiddleware(["admin", "hr"]), getAllEmployeess);
 
+const path = require("path");
+const os = require("os");
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+// Vercel serverless FS is read-only except /tmp; disk uploads must use a temp dir.
+const upload = multer({ dest: path.join(os.tmpdir(), "uploads") });
 
 router.post("/upload-document", isloginMiddleware, upload.single("document"), require("../controller/employess_controller").uploadDocument);
 router.patch("/onboarding{/:id}", isloginMiddleware, require("../controller/employess_controller").updateOnboardingStatus);
