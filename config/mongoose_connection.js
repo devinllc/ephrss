@@ -5,8 +5,14 @@ const debug = require("debug")("app:mongoose");
 // Load .env
 dotenv.config();
 // Load config from .env or fallback
-const mongoUri = `${process.env.MONGODB_URI || "mongodb://localhost:27017"}/${process.env.DB_NAME || "test"}`;
-
+let mongoUri = process.env.MONGODB_URI || "mongodb://localhost:27017";
+const dbName = process.env.DB_NAME || "test";
+if (mongoUri.includes('?')) {
+  const parts = mongoUri.split('?');
+  mongoUri = `${parts[0]}${dbName}?${parts[1]}`;
+} else {
+  mongoUri = `${mongoUri}/${dbName}`;
+}
 console.log("Connecting to:", mongoUri);
 
 // Global mongoose connection cache (for Vercel/serverless)

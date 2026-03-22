@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 
 // Define a base URL that uses the actual backend URL in both development and production
-const API_BASE_URL = 'https://ephrssbackend.vercel.app';
+const API_BASE_URL = 'http://localhost:3000';
 
 /**
  * Parse JSON response with enhanced error handling

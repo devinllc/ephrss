@@ -28,7 +28,7 @@ const AdminSignup = () => {
         try {
             console.log('Submitting admin signup with data:', formData);
 
-            const response = await fetch('https://ephrssbackend.vercel.app/admin/signup', {
+            const response = await fetch('http://localhost:3000/admin/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

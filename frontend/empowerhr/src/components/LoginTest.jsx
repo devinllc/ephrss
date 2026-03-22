@@ -214,7 +214,7 @@ const LoginTest = () => {
 
         // Method 1: Basic fetch with credentials
         try {
-            const response1 = await fetch('https://ephrssbackend.vercel.app/attendence/status', {
+            const response1 = await fetch('http://localhost:3000/attendence/status', {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -235,7 +235,7 @@ const LoginTest = () => {
         try {
             const response2 = await axios({
                 method: 'get',
-                url: 'https://ephrssbackend.vercel.app/attendence/status',
+                url: 'http://localhost:3000/attendence/status',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -257,7 +257,7 @@ const LoginTest = () => {
 
         // Method 3: Fetch with token in URL
         try {
-            const response3 = await fetch(`https://ephrssbackend.vercel.app/attendence/status?token=${token}`, {
+            const response3 = await fetch(`http://localhost:3000/attendence/status?token=${token}`, {
                 method: 'GET',
                 credentials: 'include'
             });
@@ -275,7 +275,7 @@ const LoginTest = () => {
         try {
             const response4 = await axios({
                 method: 'get',
-                url: 'https://ephrssbackend.vercel.app/attendence/status',
+                url: 'http://localhost:3000/attendence/status',
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },
@@ -296,7 +296,7 @@ const LoginTest = () => {
 
         // Method 5: Try with X-Access-Token header (common alternative format)
         try {
-            const response5 = await fetch('https://ephrssbackend.vercel.app/attendence/status', {
+            const response5 = await fetch('http://localhost:3000/attendence/status', {
                 method: 'GET',
                 headers: {
                     'X-Access-Token': token
@@ -315,7 +315,7 @@ const LoginTest = () => {
 
         // Method 6: With token in URL path (some APIs use this format)
         try {
-            const response6 = await fetch(`https://ephrssbackend.vercel.app/attendence/status/token/${token}`, {
+            const response6 = await fetch(`http://localhost:3000/attendence/status/token/${token}`, {
                 method: 'GET'
             });
 
@@ -330,7 +330,7 @@ const LoginTest = () => {
 
         // Method 7: Try with both token in Authorization header AND cookies
         try {
-            const response7 = await fetch('https://ephrssbackend.vercel.app/attendence/status', {
+            const response7 = await fetch('http://localhost:3000/attendence/status', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -415,7 +415,7 @@ const LoginTest = () => {
             const token = Cookies.get('token');
 
             // Direct call to backend without proxy
-            const response = await fetch('https://ephrssbackend.vercel.app/attendance/status', {
+            const response = await fetch('http://localhost:3000/attendance/status', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

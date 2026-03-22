@@ -32,7 +32,8 @@ const CreateEmployee = ({ onClose, onEmployeeCreated }) => {
             if (!token) throw new Error('Authentication required. Please log in again.');
             Cookies.set('token', token, { expires: 1 });
 
-            const response = await fetch('/api/employees/create', {
+            // Import authenticatedFetch (assuming it exists, otherwise just use fetch pointing explicitly config)
+            const response = await fetch('http://localhost:3000/employees/create', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

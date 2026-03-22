@@ -29,17 +29,29 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await authenticatedFetch('/auth/signup', {
+      let endpoint = '/admin/signup';
+      let payload = {
+        fullName: formData.name,
+        email: formData.email,
+        password: formData.password,
+        companyName: "User Company", // Hardcoded or should be added to form
+        role: formData.role
+      };
+
+      const response = await authenticatedFetch(endpoint, {
         method: 'POST',
-        body: JSON.stringify(formData)
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
 
-      if (response.success) {
-        localStorage.setItem('userData', JSON.stringify(response.data.user));
-        localStorage.setItem('token', response.data.token);
-        navigate('/');
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate('/login');
       } else {
-        setError(response.message || 'Signup failed');
+        setError(data.message || 'Signup failed');
       }
     } catch (err) {
       setError('Failed to sign up. Please try again.');

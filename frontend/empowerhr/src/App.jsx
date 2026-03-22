@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import AdminSignup from "./pages/AdminSignup";
 import AdminDashboard from "./pages/AdminDashboard";
 import Attendance from "./pages/Attendance";
 import Leave from "./pages/Leave";
@@ -34,6 +35,12 @@ function App() {
           path="/signup"
           element={
             isAuthenticated ? <Navigate to="/" replace /> : <Signup />
+          }
+        />
+        <Route
+          path="/admin/signup"
+          element={
+            isAuthenticated ? <Navigate to="/" replace /> : <AdminSignup />
           }
         />
 

@@ -818,7 +818,12 @@ const EmployeeDashboard = () => {
         setIsLoadingTasks(true);
         setTaskError(null);
         try {
-            const response = await authenticatedFetch('/task/user/assigned');
+            const userDataString = Cookies.get('userData') || localStorage.getItem('userData');
+            if (!userDataString) throw new Error("User data not found for tasks");
+            const user = JSON.parse(userDataString);
+            if (!user._id) throw new Error("User ID not found for tasks");
+
+            const response = await authenticatedFetch(`/task/${user._id}`);
             if (response.ok) {
                 const data = await parseJsonResponse(response);
                 if (data && Array.isArray(data)) {

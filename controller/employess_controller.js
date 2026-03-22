@@ -42,7 +42,7 @@ module.exports.createEmployees = async (req, res) => {
 module.exports.employeeLogin = async (req, res) => {
     const { email, password, deviceId } = req.body;
     const employee = await emplyees_model.findOne({ email });
-    if (!employee) { return res.status(402).json({ error: "Somethimg is incorrect", }); };
+    if (!employee) { return res.status(401).json({ error: "Something is incorrect", }); };
     // Device lock logic
     if (employee.deviceId && employee.deviceId !== deviceId) {
         return res.status(403).json({ message: "Access denied: device mismatch. Contact admin." });
