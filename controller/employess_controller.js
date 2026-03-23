@@ -60,7 +60,8 @@ module.exports.employeeLogin = async (req, res) => {
     res.cookie('token', token);
     res.status(200).json({
         message: "User login successfully",
-        token
+        token,
+        role: employee.role || "user"
     });
 };
 
