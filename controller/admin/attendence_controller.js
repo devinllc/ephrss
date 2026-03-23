@@ -30,6 +30,48 @@ module.exports.verifyAttendance = async (req, res) => {
 };
 
 /**
+ * Admin/HR: mark attendance for a staff (present/absent) for a given day.
+ * This endpoint upserts Attendance { employee, date } and sets { status, verified:true }.
+ */
+exports.markAttendance = async (req, res) => {
+  try {
+    const { staffId, date, isPresent, status } = req.body;
+
+    if (!staffId) {
+      return res.status(400).json({ message: "staffId is required" });
+    }
+
+    const attendanceDate = date ? new Date(date) : new Date();
+    // Normalize to start-of-day so unique index works reliably.
+    attendanceDate.setHours(0, 0, 0, 0);
+
+    const finalStatus = status ??
+        (isPresent === true ? "present" : "absent");
+
+    if (!["present", "half-day", "absent"].includes(finalStatus)) {
+      return res.status(400).json({ message: "Invalid attendance status" });
+    }
+
+    const attendance = await Attendance.findOneAndUpdate(
+      { employee: staffId, date: attendanceDate },
+      {
+        $setOnInsert: { employee: staffId, date: attendanceDate },
+        $set: { status: finalStatus, verified: true },
+      },
+      { upsert: true, new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      message: "Attendance marked successfully",
+      attendance,
+    });
+  } catch (err) {
+    console.error("Mark attendance error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+/**
  * @desc    Get all attendance records
  * @route   GET /api/attendance
  * @access  Admin / HR / SuperAdmin

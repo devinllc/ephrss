@@ -6,6 +6,7 @@ import AdminSignup from "./pages/AdminSignup";
 import AdminDashboard from "./pages/AdminDashboard";
 import Attendance from "./pages/Attendance";
 import Leave from "./pages/Leave";
+import AdminPayrollDashboard from "./pages/AdminPayrollDashboard";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -55,6 +56,12 @@ function App() {
 
       <Route path="/attendance" element={<Attendance/>} />
       <Route path="/leave" element={<Leave/>} />
+      <Route
+        path="/admin/payroll"
+        element={
+          isAuthenticated ? <AdminPayrollDashboard /> : <Navigate to="/login" replace />
+        }
+      />
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

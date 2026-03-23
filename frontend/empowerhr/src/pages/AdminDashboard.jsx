@@ -5,7 +5,7 @@ import CreateEmployee from '../components/CreateEmployee';
 import { authenticatedFetch, parseJsonResponse, resetEmployeeDevice, API_BASE_URL } from '../utils/api';
 // import AttendanceList from './Attendance';
 // import LeaveList from './Leave';
-import { FiLogOut, FiUserPlus, FiCalendar, FiEye, FiRefreshCw, FiCheckCircle, FiPlus,  FiClipboard } from 'react-icons/fi';
+import { FiLogOut, FiUserPlus, FiCalendar, FiEye, FiRefreshCw, FiCheckCircle, FiPlus, FiClipboard, FiDollarSign } from 'react-icons/fi';
 import TaskForm from '../components/TaskForm';
 import { motion, AnimatePresence } from 'framer-motion';
 // Mock data function for fallback
@@ -370,7 +370,7 @@ const handleLeaveClick = () => {
 
       {/* Dashboard Quick Actions */}
       {/* Quick Actions Grid (Improved) */}
-<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 px-4 sm:px-0">
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8 px-4 sm:px-0">
   {/* Add Employee Card */}
   <motion.div
     whileHover={{ scale: 1.02 }}
@@ -439,6 +439,24 @@ const handleLeaveClick = () => {
       <div className="ml-4">
         <h3 className="text-lg font-semibold">Leave</h3>
         <p className="text-sm opacity-90">Manage requests</p>
+      </div>
+    </div>
+  </motion.div>
+
+  {/* Payroll Card */}
+  <motion.div
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    className="bg-gradient-to-br from-teal-600 to-cyan-500 text-white rounded-xl shadow-lg cursor-pointer"
+    onClick={() => navigate('/admin/payroll')}
+  >
+    <div className="p-6 flex items-center">
+      <div className="bg-white/10 p-3 rounded-lg">
+        <FiDollarSign className="text-2xl" />
+      </div>
+      <div className="ml-4">
+        <h3 className="text-lg font-semibold">Payroll</h3>
+        <p className="text-sm opacity-90">Generate & approve</p>
       </div>
     </div>
   </motion.div>
