@@ -10,6 +10,7 @@ router.post('/generate', isloginMiddleware, roleMiddleware(["admin", "hr"]), gen
 router.patch('/approve', isloginMiddleware, roleMiddleware(["admin", "hr"]), approvePayroll);
 router.get('/status', isLoginEmployeeMiddleware , getEmployeePayrolls);
 router.get('/all', isloginMiddleware, roleMiddleware(['admin','hr']), getAllPayrolls);
+router.get('/', isloginMiddleware, roleMiddleware(['admin','hr']), getAllPayrolls);
 router.get('/:id/pdf', isloginMiddleware, downloadPayslipPdf);
 
 
