@@ -32,6 +32,14 @@ const leaveSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Admin"
   },
+  adminNote: {
+    type: String,
+    default: ""
+  },
+  attachment: {
+    type: String, // URL/Path to medical cert/proof
+    default: ""
+  },
   appliedAt: {
     type: Date,
     default: Date.now

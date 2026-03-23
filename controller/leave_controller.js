@@ -20,7 +20,8 @@ module.exports.applyForLeave = async (req, res) => {
       toDate,
       reason,
       type,
-      status: "pending", // Default status is pending
+      attachment: req.body.attachment || "",
+      status: "pending",
     });
 
     await newLeave.save();
@@ -55,7 +56,8 @@ module.exports.approveOrRejectLeave = async (req, res) => {
 
     // Update leave status and approvedBy field
     leave.status = status;
-    leave.approvedBy = admin._id;  // Mark who approved or rejected
+    leave.approvedBy = admin._id; 
+    leave.adminNote = req.body.adminNote || "";
     await leave.save();
 
     res.status(200).json({ message: `Leave ${status} successfully`, leave });

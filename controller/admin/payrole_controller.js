@@ -1,6 +1,92 @@
+const PDFDocument = require("pdfkit");
+
 const Attendance = require("../../model/attendence_model");
 const Leave = require("../../model/leave_model");
 const Payroll = require("../../model/payrole_model");
+
+// ... (existing code: generatePayroll, approvePayroll, getAllPayrolls) ...
+
+module.exports.downloadPayslipPdf = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const payroll = await Payroll.findById(id).populate('employee');
+
+        if (!payroll) {
+            return res.status(404).json({ message: "Payroll record not found" });
+        }
+
+        const doc = new PDFDocument({ margin: 50 });
+        let filename = `payslip_${payroll.employee.name}_${payroll.month}_${payroll.year}.pdf`;
+        
+        // Sanitize filename
+        filename = encodeURIComponent(filename);
+
+        res.setHeader('Content-disposition', 'attachment; filename="' + filename + '"');
+        res.setHeader('Content-type', 'application/pdf');
+
+        // Header
+        doc.fontSize(20).text('EMPOWER HR - PAYSLIP', { align: 'center' });
+        doc.moveDown();
+        doc.fontSize(12).text(`Month/Year: ${payroll.month}/${payroll.year}`, { align: 'right' });
+        doc.moveDown();
+
+        // Employee Details
+        doc.text('Employee Details:', { underline: true });
+        doc.text(`Name: ${payroll.employee.name}`);
+        doc.text(`Email: ${payroll.employee.email}`);
+        doc.text(`Salary: ${payroll.basicSalary}`);
+        doc.moveDown();
+
+        // Table Header
+        const startX = 50;
+        const col1 = 50;
+        const col2 = 350;
+
+        doc.text('Description', col1, doc.y, { width: 300 });
+        doc.text('Amount', col2, doc.y, { align: 'right' });
+        doc.moveDown(0.5);
+        doc.moveTo(startX, doc.y).lineTo(550, doc.y).stroke();
+        doc.moveDown();
+
+        // Earnings
+        doc.text('Basic Salary (Adjusted for Attendance)', col1);
+        doc.text(payroll.grossSalary.toFixed(2), col2, doc.y, { align: 'right' });
+        doc.moveDown();
+
+        payroll.allowances.forEach(allowance => {
+            doc.text(`Allowance: ${allowance.type}`, col1);
+            doc.text(allowance.amount.toFixed(2), col2, doc.y, { align: 'right' });
+            doc.moveDown();
+        });
+
+        doc.moveTo(startX, doc.y).lineTo(550, doc.y).stroke();
+        doc.moveDown();
+
+        // Deductions
+        doc.fillColor('red').text('Deductions:', col1, doc.y, { underline: true });
+        doc.moveDown();
+
+        payroll.deductions.forEach(deduction => {
+            doc.text(deduction.type || "Deduction", col1);
+            doc.text(deduction.amount.toFixed(2), col2, doc.y, { align: 'right' });
+            doc.moveDown();
+        });
+
+        doc.moveTo(startX, doc.y).lineTo(550, doc.y).stroke();
+        doc.moveDown();
+
+        // Total
+        doc.fillColor('black').fontSize(14).text('Net Salary:', col1);
+        doc.text(`INR ${payroll.netSalary.toFixed(2)}`, col2, doc.y, { align: 'right' });
+
+        doc.end();
+        doc.pipe(res);
+
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+        res.status(500).json({ message: "Error generating payslip PDF" });
+    }
+};
 
 module.exports.generatePayroll = async (req, res) => {
     try {
