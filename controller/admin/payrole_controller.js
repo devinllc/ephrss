@@ -68,8 +68,8 @@ module.exports.generatePayroll = async (req, res) => {
         // Combine manual deductions with calculated ones
         const calculatedDeductions = [
           ...deductions,
-          { name: "Professional Tax", amount: professionalTax },
-          { name: "PF (Employee Share)", amount: providendFund }
+          { type: "Professional Tax", amount: professionalTax },
+          { type: "PF (Employee Share)", amount: providendFund }
         ];
 
         const totalDeductions = calculatedDeductions.reduce((sum, item) => sum + (item.amount || 0), 0);
