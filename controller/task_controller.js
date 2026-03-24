@@ -195,9 +195,65 @@ exports.getAllAdminTasks = async (req, res) => {
 exports.startTask = async (req, res) => {
   try {
     const { taskId } = req.body;
-    const task = await Task.findByIdAndUpdate(taskId, { status: "in-progress", startedAt: new Date() }, { new: true });
+    const task = await Task.findById(taskId);
+    if (!task) return res.status(404).json({ error: "Task not found" });
+
+    // Strict dependency check
+    if (task.blockingType === "strict" && task.dependsOn && task.dependsOn.length > 0) {
+      const pendingDepsCount = await Task.countDocuments({
+        _id: { $in: task.dependsOn },
+        status: { $ne: "completed" }
+      });
+
+      if (pendingDepsCount > 0) {
+        return res.status(400).json({ 
+          error: "Cannot start task. Previous dependencies must be completed first." 
+        });
+      }
+    }
+
+    task.status = "in-progress";
+    task.startedAt = new Date();
+    await task.save();
     res.json(task);
   } catch (err) { res.status(400).json({ error: err.message }); }
+};
+
+// ✅ Get Projects with User Tasks (Project Folder View)
+exports.getProjectTasksForUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    // Find all tasks assigned to user
+    const tasks = await Task.find({ assignedTo: userId })
+      .populate("projectId", "title description status")
+      .populate("dependsOn", "title status");
+
+    // Grouping logic
+    const projectGroups = {};
+    const unassignedTasks = [];
+
+    tasks.forEach(task => {
+      if (task.projectId) {
+        const pId = task.projectId._id.toString();
+        if (!projectGroups[pId]) {
+          projectGroups[pId] = {
+            project: task.projectId,
+            tasks: []
+          };
+        }
+        projectGroups[pId].tasks.push(task);
+      } else {
+        unassignedTasks.push(task);
+      }
+    });
+
+    res.json({
+      projects: Object.values(projectGroups),
+      unassignedTasks
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 exports.completeTask = async (req, res) => {

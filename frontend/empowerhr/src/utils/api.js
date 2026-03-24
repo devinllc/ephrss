@@ -503,3 +503,25 @@ export const updateWebhook = async (webhookUrl) => {
     });
     return await parseJsonResponse(response);
 };
+/**
+ * 📁 Project Services
+ */
+export const fetchProjects = async () => {
+    try {
+        const response = await authenticatedFetch('/project/');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch projects: ${response.status}`);
+        }
+        const data = await parseJsonResponse(response);
+        return {
+            success: true,
+            data: data.data || data || []
+        };
+    } catch (error) {
+        console.error('Error fetching projects:', error);
+        return {
+            success: false,
+            message: error.message || 'Failed to fetch projects'
+        };
+    }
+};

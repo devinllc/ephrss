@@ -12,6 +12,7 @@ router.post(
   taskController.createTask
 );
 router.get("/", taskController.getTasks); // supports filter/search
+router.get("/user/:userId/projects", taskController.getProjectTasksForUser);
 router.get("/user/:id", taskController.getTaskById); // get tasks by user ID
 router.get("/:id", taskController.getTaskById);
 router.put(

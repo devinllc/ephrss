@@ -58,6 +58,22 @@ const taskSchema = new mongoose.Schema({
     default: "pending"
   },
 
+  dependsOn: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Task"
+  }],
+
+  blockingType: {
+    type: String,
+    enum: ["strict", "none"],
+    default: "strict"
+  },
+
+  isParallel: {
+    type: Boolean,
+    default: false
+  },
+
   startedAt: {
     type: Date,
     default: null
