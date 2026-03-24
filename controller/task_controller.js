@@ -222,9 +222,17 @@ exports.startTask = async (req, res) => {
 // ✅ Get Projects with User Tasks (Project Folder View)
 exports.getProjectTasksForUser = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    let targetId = req.params.userId;
+
+    // If targetId is an email, find the employee first
+    if (targetId.includes("@")) {
+      const employee = await require("../model/employee_model").findOne({ email: targetId });
+      if (!employee) return res.status(404).json({ error: "Employee not found with this email" });
+      targetId = employee._id;
+    }
+
     // Find all tasks assigned to user
-    const tasks = await Task.find({ assignedTo: userId })
+    const tasks = await Task.find({ assignedTo: targetId })
       .populate("projectId", "title description status")
       .populate("dependsOn", "title status");
 
