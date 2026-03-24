@@ -433,3 +433,73 @@ export const createTask = async (taskData) => {
         throw error;
     }
 }; 
+/**
+ * 🧠 Intelligence & AI Services
+ */
+export const getAIReport = async (employeeId) => {
+    const response = await authenticatedFetch(`/system/ai/daily-report/${employeeId}`);
+    return await parseJsonResponse(response);
+};
+
+export const getCompanyIntelligence = async () => {
+    const response = await authenticatedFetch('/system/ai/company-insights');
+    return await parseJsonResponse(response);
+};
+
+export const triggerRootCause = async (employeeId) => {
+    const response = await authenticatedFetch(`/system/action/root-cause/${employeeId}`);
+    return await parseJsonResponse(response);
+};
+
+/**
+ * 👔 Manager & Team Services
+ */
+export const getTeamPerformance = async () => {
+    const response = await authenticatedFetch('/manager/team-performance');
+    return await parseJsonResponse(response);
+};
+
+export const getTeamAlerts = async () => {
+    const response = await authenticatedFetch('/manager/team-alerts');
+    return await parseJsonResponse(response);
+};
+
+/**
+ * 🔒 Compliance & Audit
+ */
+export const getAuditLogs = async () => {
+    const response = await authenticatedFetch('/system/activity/audit-logs');
+    return await parseJsonResponse(response);
+};
+
+/**
+ * 💼 CRM & Leads
+ */
+export const getLeads = async () => {
+    const response = await authenticatedFetch('/crm/leads');
+    return await parseJsonResponse(response);
+};
+
+export const createLead = async (leadData) => {
+    const response = await authenticatedFetch('/crm/leads', {
+        method: 'POST',
+        body: JSON.stringify(leadData)
+    });
+    return await parseJsonResponse(response);
+};
+
+/**
+ * ⚙️ System Settings & Integrations
+ */
+export const getSystemSettings = async () => {
+    const response = await authenticatedFetch('/system/integrations/webhook');
+    return await parseJsonResponse(response);
+};
+
+export const updateWebhook = async (webhookUrl) => {
+    const response = await authenticatedFetch('/system/integrations/webhook', {
+        method: 'POST',
+        body: JSON.stringify({ webhookUrl })
+    });
+    return await parseJsonResponse(response);
+};

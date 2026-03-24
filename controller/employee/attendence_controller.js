@@ -5,8 +5,9 @@ module.exports.punchIn = async (req, res) => {
     const employee = req.user;
     const { lat, lng, photoUrl, deviceId } = req.body;
 
-    const now = new Date();
-    const today = new Date(now.setHours(0, 0, 0, 0));  // Get today's date (00:00:00)
+    const punchTime = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     if (employee.deviceId && employee.deviceId !== deviceId) {
         return res.status(403).json({ message: "Device mismatch. Please contact admin." });
@@ -21,7 +22,7 @@ module.exports.punchIn = async (req, res) => {
     try {
         const existing = await Attendance.findOne({ employee: employee._id, date: today });
         if (existing) {
-            return res.status(200).json({ message: "Already punched in today." });
+            return res.status(200).json({ message: "Already punched in today.", attendance: existing });
         }
 
         // Create a new attendance record for the employee
@@ -29,8 +30,8 @@ module.exports.punchIn = async (req, res) => {
             employee: employee._id,
             date: today,
             punchIn: {
-                time: now,
-                location: { lat, lng },
+                time: punchTime,
+                location: { lat: lat || 0, lng: lng || 0 },
                 photoUrl: photoUrl || null,
             },
             status: "present",
@@ -49,8 +50,9 @@ module.exports.punchOut = async (req, res) => {
     const employee = req.user;
     const { lat, lng, photoUrl } = req.body;
 
-    const now = new Date();
-    const today = new Date(now.setHours(0, 0, 0, 0)); // Set the time to 00:00:00 for today
+    const punchTime = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     try {
         // Find the attendance record for today
@@ -67,8 +69,8 @@ module.exports.punchOut = async (req, res) => {
 
         // Update the punch-out time and location
         attendance.punchOut = {
-            time: now,
-            location: { lat, lng },
+            time: punchTime,
+            location: { lat: lat || 0, lng: lng || 0 },
             photoUrl: photoUrl || null,
         };
 
@@ -95,17 +97,17 @@ module.exports.punchOut = async (req, res) => {
 
 
 module.exports.getAttendanceDetails = async (req, res) => {
-    const employee = req.user; // Assuming employee is authenticated via middleware
+    const employee = req.user; 
     
-    const now = new Date();
-    const today = new Date(now.setHours(0, 0, 0, 0)); // Set the time to the beginning of today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
   
     try {
       // Find today's attendance record for the logged-in employee
       const attendance = await Attendance.findOne({
         employee: employee._id,
         date: today
-      }).populate('employee', 'fullName email'); // Populate employee details if needed
+      }).populate('employee', 'fullName email');
   
       if (!attendance) {
         return res.status(404).json({ message: "Attendance record not found for today." });
