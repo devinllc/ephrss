@@ -58,6 +58,21 @@ const taskSchema = new mongoose.Schema({
     default: "pending"
   },
 
+  startedAt: {
+    type: Date,
+    default: null
+  },
+
+  completedAt: {
+    type: Date,
+    default: null
+  },
+
+  actualTime: {
+    type: Number, // total actual time spent in hours or days
+    default: 0
+  },
+
   progress: {
     type: Number,
     min: 0,

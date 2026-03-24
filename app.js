@@ -20,9 +20,22 @@ const db = require("./config/mongoose_connection");
 const admin_model = require("./model/admin_model");
 
 require("dotenv").config();
+// Initialize Agenda jobs
+const { generatePerformanceJob } = require("./jobs/performance_job");
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Serverless Cron Endpoint
+app.get("/api/cron/performance", async (req, res) => {
+    try {
+        await generatePerformanceJob();
+        res.status(200).json({ status: "success", message: "Daily performance successfully executed." });
+    } catch (err) {
+        res.status(500).json({ status: "error", message: err.message });
+    }
+});
 app.use(express.static(path.join(__dirname, "public")));
 // app.use(expressSession({
 //     resave: false,
@@ -67,6 +80,8 @@ app.use("/projects", projectRouter);
 app.use("/task", taskRouter);
 app.use("/saved-logins", deviceLoginRouter);
 app.use("/performance", performanceRouter);
+const fieldRouter = require("./routes/field_router");
+app.use("/field", fieldRouter);
 app.use("/subscription", subscriptionRouter);
 app.use("/insights", insightsRouter);
 

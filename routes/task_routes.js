@@ -46,4 +46,24 @@ router.post(
 // Get dashboard for user
 router.get("/user/:userId/dashboard", taskController.getDashboard);
 
+// 🔧 Core Task APIs (MANDATORY) Missing Routes
+router.patch("/update-status", isloginMiddleware, taskController.updateStatus);
+router.patch("/update-details", isloginMiddleware, taskController.updateDetails);
+router.get("/my-tasks", isloginMiddleware, taskController.getMyTasks);
+router.get("/admin/all", isloginMiddleware, roleMiddleware(["admin", "hr"]), taskController.getAllAdminTasks);
+
+// ⚙️ Task Lifecycle APIs (IMPORTANT)
+router.patch("/start", isloginMiddleware, taskController.startTask);
+router.patch("/complete", isloginMiddleware, taskController.completeTask);
+router.patch("/assign", isloginMiddleware, roleMiddleware(["admin", "hr", "employee"]), taskController.reassignTask);
+router.patch("/set-priority", isloginMiddleware, taskController.setPriority);
+router.patch("/set-deadline", isloginMiddleware, taskController.setDeadline);
+
+// 📊 Task Analytics APIs (CRITICAL)
+router.get("/analytics/me", isloginMiddleware, taskController.getAnalyticsMe);
+router.get("/analytics/company", isloginMiddleware, roleMiddleware(["admin", "hr"]), taskController.getAnalyticsCompany);
+router.get("/analytics/:employeeId", isloginMiddleware, roleMiddleware(["admin", "hr"]), taskController.getAnalyticsEmployee);
+router.get("/metrics/overdue", isloginMiddleware, taskController.getOverdueTasks);
+router.get("/metrics/completion-rate", isloginMiddleware, taskController.getCompletionRate);
+
 module.exports = router;
