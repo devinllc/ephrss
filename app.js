@@ -83,7 +83,13 @@ app.use("/performance", performanceRouter);
 const fieldRouter = require("./routes/field_router");
 app.use("/field", fieldRouter);
 app.use("/subscription", subscriptionRouter);
-app.use("/insights", insightsRouter);
+// 🔗 NEW: SaaS & AI Modules Expansion
+app.use("/alerts", require("./routes/alert_router"));
+app.use("/manager", require("./routes/manager_router"));
+app.use("/actions", require("./routes/ai_action_router"));
+app.use("/activity", require("./routes/activity_audit_router")); // Handles Live Events + Audits
+app.use("/system", require("./routes/system_router")); // Handles System Integrations, AI, Billing, Privacy
+app.use("/insights", insightsRouter); // Restored: auto-performance + task insights
 
 // app.listen(3000);// ✅ Only start server if not on Vercel
 if (process.env.NODE_ENV !== 'production') {

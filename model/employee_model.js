@@ -92,6 +92,28 @@ const employeeSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Admin", 
     required: true
+  },
+  
+  // Organization Hierarchy
+  isManager: {
+    type: Boolean,
+    default: false
+  },
+  managerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Employee",
+    default: null
+  },
+  team: {
+    type: String,
+    default: null
+  },
+
+  // Privacy & Control
+  privacySettings: {
+    workHoursTrackingOnly: { type: Boolean, default: true },
+    offDutyMode: { type: Boolean, default: false },
+    dataVisibility: { type: String, enum: ['public', 'manager_only', 'private'], default: 'manager_only' }
   }
 }, {
   timestamps: true
