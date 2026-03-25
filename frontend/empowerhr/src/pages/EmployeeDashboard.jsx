@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import { FiClock, FiCalendar, FiUser, FiMail, FiBriefcase, FiPhone, FiCheck, FiX, FiCheckCircle, FiList, FiAlertCircle, FiPlus } from 'react-icons/fi';
+import { FiClock, FiCalendar, FiUser, FiMail, FiBriefcase, FiPhone, FiCheck, FiX, FiCheckCircle, FiList, FiAlertCircle, FiPlus, FiDollarSign, FiLogOut } from 'react-icons/fi';
 import { getAttendanceStatus, authenticatedFetch, parseJsonResponse, getAttendanceStatusWithTokenInBody } from '../utils/api';
 
 // Global axios config
@@ -901,662 +901,221 @@ const EmployeeDashboard = () => {
     };
 
     return (
-        <div className="employee-dashboard">
-            <div className="flex flex-col min-h-screen bg-gray-lightest">
-                {/* Navigation Bar */}
-                <nav className="bg-gradient-primary text-white p-4 shadow-md">
-                    <div className="flex justify-between items-center">
-                        <h1 className="text-2xl font-bold">EmpowerHR</h1>
-                        <div className="flex items-center space-x-4">
-                            <span className="text-white">{userData.name || 'Employee'}</span>
-                            <button
-                                onClick={handleLogout}
-                                className="bg-white bg-opacity-80 hover:bg-opacity-100 px-4 py-2 rounded-lg text-sm font-medium text-primary transition"
-                            >
-                                Logout
-                            </button>
-                        </div>
+        <div className="flex flex-col min-h-screen bg-white font-['Poppins',_sans-serif]">
+            {/* App Bar like Flutter */}
+            <nav className="bg-white sticky top-0 z-30 border-b border-gray-100 flex items-center justify-between px-4 sm:px-6 h-16">
+                {/* Left empty for center balance or icon */}
+                <div className="w-1/3"></div>
+                {/* Center Logo */}
+                <div className="w-1/3 flex justify-center">
+                    <h1 className="text-2xl font-black text-[#6B15AD] tracking-tight">EmpowerHR</h1>
+                </div>
+                {/* Right Actions */}
+                <div className="w-1/3 flex justify-end items-center gap-4">
+                    <button onClick={handleLogout} className="text-[#6B15AD] p-2 hover:bg-[#6B15AD]/10 rounded-full transition">
+                        <FiLogOut className="text-xl" />
+                    </button>
+                    <div className="w-9 h-9 border-2 border-[#6B15AD] rounded-full flex items-center justify-center text-[#6B15AD] bg-[#6B15AD]/10 font-bold">
+                        {userData.name ? userData.name.charAt(0) : 'E'}
                     </div>
-                </nav>
+                </div>
+            </nav>
 
-                <div className="flex-1 p-6 md:p-8">
-                    {/* Welcome Section with Profile Info */}
-                    <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-                        <div className="flex flex-col md:flex-row items-start md:items-center">
-                            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold mb-4 md:mb-0 md:mr-6">
-                                {userData.name ? userData.name.charAt(0) : 'E'}
-                            </div>
-                            <div className="flex-1">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-1">{userData.name || 'Welcome Employee'}</h2>
-                                <p className="text-gray-600 mb-2">{userData.email || 'Login to view your email'}</p>
-                                <div className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-4">
-                                    {userData.department || 'Employee'}
+            <main className="flex-1 w-full max-w-5xl mx-auto py-6 px-4">
+                {/* Header Section */}
+                <div className="mb-8">
+                    <h2 className="text-2xl md:text-3xl font-bold text-[#6B15AD]">Welcome,</h2>
+                    <p className="text-[#6B15AD]/80 text-lg md:text-xl font-medium mt-1">
+                        {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </p>
+                </div>
+
+                {/* Dashboard Grid Container */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    
+                    {/* Main Left Area: Attendance & Punch */}
+                    <div className="md:col-span-7 space-y-6">
+                        {/* Attendance Punch Card */}
+                        <div className="bg-[#6B15AD]/[0.05] rounded-2xl p-6 border border-[#6B15AD]/10">
+                            <h3 className="text-xl font-bold text-[#6B15AD] mb-6">Today's Status</h3>
+                            
+                            <div className="flex flex-col sm:flex-row gap-6 items-center justify-between mb-8">
+                                <div className="text-center w-full">
+                                    <p className="text-sm font-bold text-[#6B15AD] mb-2 uppercase tracking-wide">In</p>
+                                    <p className="text-2xl font-mono text-gray-800">{attendanceStatus?.punchInTime || '--:--'}</p>
                                 </div>
-
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                                    <div className="bg-gray-50 rounded-lg p-3 transform transition hover:shadow-md">
-                                        <p className="text-xs text-gray-500 uppercase">Phone</p>
-                                        <p className="font-medium text-gray-800">{userData.phone || 'Update Profile'}</p>
-                                    </div>
-                                    <div className="bg-gray-50 rounded-lg p-3 transform transition hover:shadow-md">
-                                        <p className="text-xs text-gray-500 uppercase">Employment</p>
-                                        <p className="font-medium text-gray-800 capitalize">{userData.employmentType || 'Full-time'}</p>
-                                    </div>
-                                    <div className="bg-gray-50 rounded-lg p-3 transform transition hover:shadow-md">
-                                        <p className="text-xs text-gray-500 uppercase">Status</p>
-                                        <p className={`font-medium capitalize ${userData.status === 'active' ? 'text-green-600' : userData.status === 'pending' ? 'text-yellow-600' : 'text-green-600'}`}>
-                                            {userData.status || 'Active'}
-                                        </p>
-                                    </div>
-                                    <div className="bg-gray-50 rounded-lg p-3 transform transition hover:shadow-md">
-                                        <p className="text-xs text-gray-500 uppercase">Joined</p>
-                                        <p className="font-medium text-gray-800">{userData.joinDate ? formatDate(userData.joinDate) : 'Recent'}</p>
-                                    </div>
+                                <div className="h-12 w-px bg-[#6B15AD]/20 hidden sm:block"></div>
+                                <div className="text-center w-full">
+                                    <p className="text-sm font-bold text-[#6B15AD] mb-2 uppercase tracking-wide">Out</p>
+                                    <p className="text-2xl font-mono text-gray-800">{attendanceStatus?.punchOutTime || '--:--'}</p>
+                                </div>
+                                <div className="h-12 w-px bg-[#6B15AD]/20 hidden sm:block"></div>
+                                <div className="text-center w-full">
+                                    <p className="text-sm font-bold text-[#6B15AD] mb-2 uppercase tracking-wide">Hours</p>
+                                    <p className="text-2xl font-mono font-bold text-gray-800">{attendanceStatus?.totalHours || '0.0'}</p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Attendance Status Section */}
-                        <div className="md:col-span-1">
-                            <div className="card hover-lift attendance-card">
-                                <h3 className="section-title text-xl font-semibold mb-4">Today's Attendance</h3>
-                                {isLoading ? (
-                                    <div className="animate-pulse space-y-4">
-                                        <div className="h-8 bg-gray-light rounded-md w-1/3"></div>
-                                        <div className="h-20 bg-gray-light rounded-md"></div>
-                                        <div className="h-10 bg-gray-light rounded-md w-1/2"></div>
-                                    </div>
+                            
+                            <div className="flex items-center gap-4">
+                                {(isPunchedIn || (attendanceStatus?.status === 'present' && attendanceStatus?.punchInTime && !attendanceStatus?.punchOutTime)) ? (
+                                    <button onClick={handlePunchOut} disabled={isPunchingOut} className="flex-1 py-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                                        <FiLogOut /> {isPunchingOut ? 'Processing...' : 'Punch Out'}
+                                    </button>
                                 ) : (
-                                    <>
-                                        {attendanceError ? (
-                                            <div className="text-center p-4 mb-4 bg-red-50 rounded-lg">
-                                                <p className="text-red-500">{attendanceError}</p>
+                                    <button onClick={handlePunchIn} disabled={isPunchingIn} className="flex-1 py-4 bg-[#6B15AD] hover:bg-[#58118d] text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                                        <FiCheckCircle /> {isPunchingIn ? 'Processing...' : 'Punch In'}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Recent Tasks */}
+                        <div className="bg-[#6B15AD]/[0.05] rounded-2xl p-6 border border-[#6B15AD]/10">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-bold text-[#6B15AD]">Active Tasks</h3>
+                                <button onClick={() => navigate('/tasks')} className="bg-[#6B15AD]/10 text-[#6B15AD] px-3 py-1.5 rounded-lg text-sm font-bold">Manage All</button>
+                            </div>
+                            
+                            {isLoadingTasks ? (
+                                <div className="py-6 text-center text-gray-500">Loading tasks...</div>
+                            ) : tasks.filter(t => t.status !== 'completed').length > 0 ? (
+                                <div className="space-y-3">
+                                    {tasks.filter(t => t.status !== 'completed').slice(0, 3).map(task => (
+                                        <div key={task._id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                                            <div>
+                                                <h4 className="font-bold text-gray-800">{task.title}</h4>
+                                                <p className="text-xs text-gray-500 mt-1">Due: {new Date(task.deadline).toLocaleDateString()}</p>
                                             </div>
-                                        ) : null}
-
-                                        {showFallbackOption && (
-                                            <div className="p-4 mb-4 border border-yellow-300 bg-yellow-50 rounded-lg">
-                                                <p className="text-yellow-800 mb-3">Unable to get your precise location. Do you want to proceed with an approximate location?</p>
-                                                <p className="text-sm text-yellow-700 mb-4">Note: Your HR may require verification for attendance with approximate location.</p>
-                                                <div className="flex space-x-3">
-                                                    <button
-                                                        onClick={() => handleFallbackPunch(fallbackAction)}
-                                                        className="flex-1 py-2 px-3 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-lg transition-colors"
-                                                    >
-                                                        Use Approximate Location
-                                                    </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            setShowFallbackOption(false);
-                                                            setFallbackAction(null);
-                                                        }}
-                                                        className="py-2 px-3 border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium rounded-lg transition-colors"
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {attendanceStatus ? (
-                                            <>
-                                                <div className="mb-6">
-                                                    <div className="text-xl font-semibold mb-2">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-                                                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${attendanceStatus?.status === 'present' ? 'bg-green-100 text-green-800' :
-                                                        attendanceStatus?.status === 'on_leave' ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-gray-100 text-gray-800'
-                                                        }`}>
-                                                        {attendanceStatus?.status === 'present' && !attendanceStatus?.punchOutTime ? (
-                                                            <>
-                                                                <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                                                                Punched In
-                                                            </>
-                                                        ) : attendanceStatus?.status === 'on_leave' ? (
-                                                            <>
-                                                                <span className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
-                                                                On Leave
-                                                            </>
-                                                        ) : attendanceStatus?.status === 'present' && attendanceStatus?.punchOutTime ? (
-                                                            <>
-                                                                <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                                                                Completed
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
-                                                                Not Punched In
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                <div className="grid grid-cols-2 gap-4 mb-6">
-                                                    <div className="stat-card transform transition hover:shadow-md">
-                                                        <div className="text-sm text-gray-500">Punch In</div>
-                                                        <div className="font-semibold text-gray-800">
-                                                            {attendanceStatus?.punchInTime || 'Not Punched'}
-                                                        </div>
-                                                    </div>
-                                                    <div className="stat-card transform transition hover:shadow-md">
-                                                        <div className="text-sm text-gray-500">Punch Out</div>
-                                                        <div className="font-semibold text-gray-800">
-                                                            {attendanceStatus?.punchOutTime || 'Not Punched'}
-                                                        </div>
-                                                    </div>
-                                                    <div className="stat-card transform transition hover:shadow-md">
-                                                        <div className="text-sm text-gray-500">Total Hours</div>
-                                                        <div className="font-semibold text-gray-800">{attendanceStatus?.totalHours || '0'} hrs</div>
-                                                    </div>
-                                                    <div className="stat-card transform transition hover:shadow-md">
-                                                        <div className="text-sm text-gray-500">Status</div>
-                                                        <div className="font-semibold capitalize">
-                                                            {attendanceStatus?.status === 'present' ? (
-                                                                <span className="text-green-600">Present</span>
-                                                            ) : attendanceStatus?.status === 'absent' ? (
-                                                                <span className="text-red-600">Absent</span>
-                                                            ) : attendanceStatus?.status === 'leave' ? (
-                                                                <span className="text-yellow-600">On Leave</span>
-                                                            ) : (
-                                                                attendanceStatus?.status || 'Unknown'
-                                                            )}
-                                                            {attendanceStatus?.location?.isDefault && (
-                                                                <span className="ml-2 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded">Approx. Location</span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <div className="text-center p-4 mb-4">
-                                                <p className="text-gray-500">No attendance record for today.</p>
-                                            </div>
-                                        )}
-
-                                        {/* Modified punch button display logic - improved by checking both status and timestamps */}
-                                        {(isPunchedIn ||
-                                            (attendanceStatus?.status === 'present' && attendanceStatus?.punchInTime && !attendanceStatus?.punchOutTime)) ? (
-                                            <button
-                                                onClick={handlePunchOut}
-                                                disabled={isPunchingOut}
-                                                className="w-full py-3 px-4 bg-gradient-to-r from-red-500 to-red-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center"
-                                            >
-                                                {isPunchingOut ? (
-                                                    <>
-                                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                        </svg>
-                                                        Processing...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                        </svg>
-                                                        Punch Out
-                                                    </>
+                                            <div className="flex gap-2">
+                                                {task.status !== 'in_progress' && (
+                                                    <button onClick={() => handleTaskStatusUpdate(task._id, 'in_progress')} className="bg-[#6B15AD]/10 text-[#6B15AD] p-2 rounded-lg hover:bg-[#6B15AD]/20 transition"><FiClock /></button>
                                                 )}
-                                            </button>
-                                        ) : (
-                                            <button
-                                                onClick={handlePunchIn}
-                                                disabled={isPunchingIn}
-                                                className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center"
-                                            >
-                                                {isPunchingIn ? (
-                                                    <>
-                                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                        </svg>
-                                                        Processing...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                        </svg>
-                                                        Punch In
-                                                    </>
-                                                )}
-                                            </button>
-                                        )}
-                                    </>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Leave Requests Section */}
-                        <div className="md:col-span-1">
-                            <div className="card hover-lift">
-                                <h3 className="section-title text-xl font-semibold mb-4">Leave Requests</h3>
-                                {leaveRequests.length > 0 ? (
-                                    <div className="space-y-4 max-h-[400px] overflow-y-auto">
-                                        {leaveRequests.map((leave) => (
-                                            <div key={leave._id} className="leave-request-card p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition bg-white">
-                                                <div className="flex flex-col md:flex-row md:items-center justify-between">
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center mb-2">
-                                                            <span className="font-semibold mr-2 capitalize">{leave.type} Leave</span>
-                                                            <span className={`leave-status px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(leave.status)}`}>
-                                                                {leave.status}
-                                                            </span>
-                                                        </div>
-                                                        <p className="text-gray-600 mb-2 text-sm">{leave.reason}</p>
-                                                        <div className="flex items-center text-sm text-gray-500">
-                                                            <FiCalendar className="mr-1" />
-                                                            <span>{formatDate(leave.from)} - {formatDate(leave.to)}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="mt-3 md:mt-0 text-xs text-gray-400">
-                                                        Applied on {formatDate(leave.appliedOn)}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-center p-6 bg-gray-50 rounded-lg">
-                                        <p className="text-gray-500">{error || 'No leave requests found'}</p>
-                                    </div>
-                                )}
-                                <div className="mt-4">
-                                    <button
-                                        onClick={() => navigate('/apply-leave')}
-                                        className="btn-outline-primary"
-                                    >
-                                        Apply for Leave
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Payroll Section - Now in the grid next to leave requests */}
-                        <div className="md:col-span-1">
-                            <div className="card hover-lift h-full">
-                                <h3 className="section-title text-xl font-semibold mb-4">Payroll Information</h3>
-
-                                {isLoadingPayroll ? (
-                                    <div className="animate-pulse space-y-4">
-                                        <div className="h-8 bg-gray-light rounded-md w-1/3"></div>
-                                        <div className="h-20 bg-gray-light rounded-md"></div>
-                                    </div>
-                                ) : payrollError ? (
-                                    <div className="text-center p-4 mb-4 bg-blue-50 rounded-lg">
-                                        <p className="text-blue-500">{payrollError}</p>
-                                    </div>
-                                ) : payrolls.length > 0 ? (
-                                    <div>
-                                        {/* Latest Payroll Summary */}
-                                        <div className="p-4 bg-blue-50 rounded-md mb-4">
-                                            <h4 className="font-medium mb-3">Latest Payroll</h4>
-                                            <div className="space-y-2">
-                                                <div className="flex justify-between">
-                                                    <span className="text-gray-600">Period:</span>
-                                                    <span className="font-medium">{getMonthName(payrolls[0].month)} {payrolls[0].year}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-gray-600">Status:</span>
-                                                    <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${payrolls[0].status === 'approved' ? 'bg-green-100 text-green-800' :
-                                                        'bg-yellow-100 text-yellow-800'}`}>
-                                                        {payrolls[0].status.charAt(0).toUpperCase() + payrolls[0].status.slice(1)}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-gray-600">Gross:</span>
-                                                    <span>{formatCurrency(payrolls[0].grossSalary)}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-gray-600">Deductions:</span>
-                                                    <span>{formatCurrency(payrolls[0].totalDeductions)}</span>
-                                                </div>
-                                                <div className="flex justify-between pt-2 border-t border-blue-200 font-semibold">
-                                                    <span>Net Salary:</span>
-                                                    <span className="text-blue-700">{formatCurrency(payrolls[0].netSalary)}</span>
-                                                </div>
+                                                <button onClick={() => handleTaskStatusUpdate(task._id, 'completed')} className="bg-green-100 text-green-700 p-2 rounded-lg hover:bg-green-200 transition"><FiCheck /></button>
                                             </div>
                                         </div>
-
-                                        <div className="text-center">
-                
-                                            <button
-                                                onClick={() => openPayrollDetails(payrolls[0])}
-                                                className="btn-outline-primary text-sm"
-                                            >
-                                                Upgrade Now
-                                            </button>
-
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="text-center p-6 bg-gray-50 rounded-lg">
-                                        <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                        </svg>
-                                        <p className="text-gray-500">No payroll records found</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Task Management Section */}
-                        <div className="md:col-span-1">
-                            <div className="card hover-lift h-full">
-                                <h3 className="section-title text-xl font-semibold mb-4">Task Management</h3>
-                                <div className="space-y-4">
-                                    {isLoadingTasks ? (
-                                        <div className="animate-pulse space-y-4">
-                                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                                            <div className="h-20 bg-gray-200 rounded"></div>
-                                            <div className="h-20 bg-gray-200 rounded"></div>
-                                        </div>
-                                    ) : taskError ? (
-                                        <div className="text-center p-4 bg-red-50 rounded-lg">
-                                            <FiAlertCircle className="w-6 h-6 text-red-500 mx-auto mb-2" />
-                                            <p className="text-red-600">{taskError}</p>
-                                        </div>
-                                    ) : tasks.length > 0 ? (
-                                        <div className="space-y-4 max-h-[400px] overflow-y-auto">
-                                            {tasks.map((task) => (
-                                                <div key={task._id} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition">
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <h4 className="font-medium text-gray-900">{task.title}</h4>
-                                                        <span className={`px-2 py-1 text-xs rounded-full ${getTaskPriorityColor(task.priority)}`}>
-                                                            {task.priority}
-                                                        </span>
-                                                    </div>
-                                                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
-                                                    <div className="flex flex-wrap gap-2 mb-3">
-                                                        <span className={`px-2 py-1 text-xs rounded-full ${getTaskStatusColor(task.status)}`}>
-                                                            {task.status.replace('_', ' ')}
-                                                        </span>
-                                                        <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
-                                                            Due: {new Date(task.deadline).toLocaleDateString()}
-                                                        </span>
-                                                    </div>
-                                                    {task.status !== 'completed' && (
-                                                        <div className="flex gap-2">
-                                                            <button
-                                                                onClick={() => handleTaskStatusUpdate(task._id, 'in_progress')}
-                                                                className={`px-3 py-1 text-xs rounded-full ${
-                                                                    task.status === 'in_progress'
-                                                                        ? 'bg-blue-500 text-white'
-                                                                        : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                                                                }`}
-                                                            >
-                                                                In Progress
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleTaskStatusUpdate(task._id, 'completed')}
-                                                                className={`px-3 py-1 text-xs rounded-full ${
-                                                                    task.status === 'completed'
-                                                                        ? 'bg-green-500 text-white'
-                                                                        : 'bg-green-100 text-green-800 hover:bg-green-200'
-                                                                }`}
-                                                            >
-                                                                Complete
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="text-center p-6 bg-gray-50 rounded-lg">
-                                            <FiList className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                            <p className="text-gray-500">No tasks assigned</p>
-                                        </div>
-                                    )}
-                                    <button
-                                        onClick={() => navigate('/tasks')}
-                                        className="w-full btn btn-primary flex items-center justify-center space-x-2 mt-4"
-                                    >
-                                        <FiPlus className="h-5 w-5" />
-                                        <span>Manage Tasks</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Attendance History Section */}
-                    <div className="mt-6">
-                        <div className="card hover-lift">
-                            <h3 className="section-title text-xl font-semibold mb-4">
-                                Recent Attendance History
-                                <span className="ml-2 px-2 py-1 text-xs font-bold bg-yellow-400 text-yellow-800 rounded-full">PREMIUM</span>
-                            </h3>
-
-                            <div className="text-center p-8 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg border-2 border-yellow-200">
-                                <div className="flex flex-col items-center">
-                                    <svg className="w-16 h-16 text-yellow-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                    </svg>
-                                    <h4 className="text-xl font-bold text-yellow-800 mb-2">Premium Feature</h4>
-                                    <p className="text-yellow-700 mb-4">Detailed attendance history is available with our premium plan.</p>
-                                    <button
-                                        className="px-6 py-2 bg-yellow-500 text-white font-medium rounded-lg shadow-md hover:bg-yellow-600 transition-all duration-200"
-                                        onClick={() => window.open('mailto:sales@empowerhr.com?subject=Premium%20Plan%20Inquiry')}
-                                    >
-                                        Upgrade Now
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Detailed Payroll Section - Show full table below */}
-                    <div className="mt-6">
-                        <div className="card hover-lift">
-                            <h3 className="section-title text-xl font-semibold mb-4">Payroll History</h3>
-
-                            {isLoadingPayroll ? (
-                                <div className="animate-pulse space-y-4">
-                                    <div className="h-8 bg-gray-light rounded-md w-1/3"></div>
-                                    <div className="h-20 bg-gray-light rounded-md"></div>
-                                </div>
-                            ) : payrolls.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
-                                            <tr>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Basic Salary</th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gross Salary</th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deductions</th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Salary</th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
-                                            {payrolls.map((payroll, index) => (
-                                                <tr key={index} className="hover:bg-gray-50">
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                        {getMonthName(payroll.month)} {payroll.year}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {formatCurrency(payroll.basicSalary)}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {formatCurrency(payroll.grossSalary)}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {formatCurrency(payroll.totalDeductions)}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                        {formatCurrency(payroll.netSalary)}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                            ${payroll.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                                                payroll.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                                    'bg-gray-100 text-gray-800'}`}>
-                                                            {payroll.status.charAt(0).toUpperCase() + payroll.status.slice(1)}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                    ))}
                                 </div>
                             ) : (
-                                <div className="text-center p-6 bg-gray-50 rounded-lg">
-                                    <p className="text-gray-500">No payroll history available</p>
+                                <div className="py-8 text-center text-gray-500 flex flex-col items-center">
+                                    <div className="w-12 h-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center mb-2">
+                                        <FiCheck className="text-2xl" />
+                                    </div>
+                                    <p className="font-medium">No tasks assigned</p>
                                 </div>
                             )}
                         </div>
                     </div>
-                </div>
-            </div>
 
-            {/* Payroll Detail Modal */}
-            {showPayrollModal && selectedPayroll && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-                        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                            <h3 className="text-xl font-semibold text-gray-800">
-                                Payroll Details - {getMonthName(selectedPayroll.month)} {selectedPayroll.year}
-                            </h3>
-                            <button
-                                onClick={() => setShowPayrollModal(false)}
-                                className="text-gray-400 hover:text-gray-600"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <div className="p-6">
-                            <div className="grid grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <div className="bg-blue-50 p-4 rounded-lg">
-                                        <h4 className="font-medium mb-3 text-blue-800">Payment Information</h4>
-                                        <div className="space-y-2 text-sm">
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-600">Status:</span>
-                                                <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${selectedPayroll.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                                        'bg-yellow-100 text-yellow-800'}`}>
-                                                    {selectedPayroll.status.charAt(0).toUpperCase() + selectedPayroll.status.slice(1)}
-                                                </span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-600">Payment Date:</span>
-                                                <span>{selectedPayroll.paymentDate ? new Date(selectedPayroll.paymentDate).toLocaleDateString() : 'Pending'}</span>
-                                            </div>
-                                            {selectedPayroll.approvedBy && (
-                                                <div className="flex justify-between">
-                                                    <span className="text-gray-600">Approved By:</span>
-                                                    <span>Admin</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div className="bg-blue-50 p-4 rounded-lg">
-                                        <h4 className="font-medium mb-3 text-blue-800">Attendance Summary</h4>
-                                        <div className="space-y-2 text-sm">
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-600">Working Days:</span>
-                                                <span>{selectedPayroll.totalWorkingDays}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-600">Days Present:</span>
-                                                <span>{selectedPayroll.daysPresent}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-600">Leave Approved:</span>
-                                                <span>{selectedPayroll.daysLeaveApproved}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <h4 className="font-medium mb-3">Allowances</h4>
-                                    {selectedPayroll.allowances && selectedPayroll.allowances.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {selectedPayroll.allowances.map((allowance, idx) => (
-                                                <div key={idx} className="flex justify-between border-b pb-2">
-                                                    <span>{allowance.type}</span>
-                                                    <span>{formatCurrency(allowance.amount)}</span>
-                                                </div>
-                                            ))}
-                                            <div className="flex justify-between font-medium pt-2">
-                                                <span>Total Allowances</span>
-                                                <span>{formatCurrency(selectedPayroll.allowances.reduce((sum, item) => sum + item.amount, 0))}</span>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <p className="text-gray-500">No allowances</p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <h4 className="font-medium mb-3">Deductions</h4>
-                                    {selectedPayroll.deductions && selectedPayroll.deductions.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {selectedPayroll.deductions.map((deduction, idx) => (
-                                                <div key={idx} className="flex justify-between border-b pb-2">
-                                                    <span>{deduction.type}</span>
-                                                    <span>{formatCurrency(deduction.amount)}</span>
-                                                </div>
-                                            ))}
-                                            <div className="flex justify-between font-medium pt-2">
-                                                <span>Total Deductions</span>
-                                                <span>{formatCurrency(selectedPayroll.totalDeductions)}</span>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <p className="text-gray-500">No deductions</p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="mt-6 border-t border-gray-200 pt-4">
-                                <div className="flex flex-col md:flex-row md:justify-between md:items-center">
-                                    <div className="mb-4 md:mb-0">
-                                        <p className="text-sm text-gray-500">Salary Breakdown</p>
-                                        <div className="grid grid-cols-2 gap-x-10 gap-y-1 mt-2">
-                                            <div className="flex justify-between">
-                                                <span>Basic Salary:</span>
-                                                <span>{formatCurrency(selectedPayroll.basicSalary)}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span>Gross Salary:</span>
-                                                <span>{formatCurrency(selectedPayroll.grossSalary)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-blue-100 p-4 rounded-lg">
-                                        <p className="text-sm text-blue-800 mb-1">Net Salary</p>
-                                        <p className="text-2xl font-bold text-blue-900">{formatCurrency(selectedPayroll.netSalary)}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="mt-6 flex justify-end">
-                                <button
-                                    onClick={() => setShowPayrollModal(false)}
-                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-800"
-                                >
-                                    Close
+                    {/* Right Column: Self Service Tiles & Details */}
+                    <div className="md:col-span-5 space-y-6">
+                        
+                        <div className="bg-[#6B15AD]/[0.05] rounded-2xl p-6 border border-[#6B15AD]/10">
+                            <h3 className="text-xl font-bold text-[#6B15AD] mb-4">Self-service</h3>
+                            <p className="text-gray-500 text-sm mb-6">Apply for leave, view payslips, profile</p>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                                <button onClick={() => navigate('/leave')} className="bg-[#6B15AD]/10 hover:bg-[#6B15AD]/20 transition rounded-2xl p-4 flex flex-col items-center justify-center text-center aspect-[4/3]">
+                                    <FiCalendar className="text-3xl text-[#6B15AD] mb-2" />
+                                    <span className="font-bold text-[#6B15AD] text-sm">Leaves</span>
+                                </button>
+                                <button onClick={() => payrolls.length > 0 && openPayrollDetails(payrolls[0])} className="bg-[#6B15AD]/10 hover:bg-[#6B15AD]/20 transition rounded-2xl p-4 flex flex-col items-center justify-center text-center aspect-[4/3]">
+                                    <FiDollarSign className="text-3xl text-[#6B15AD] mb-2" />
+                                    <span className="font-bold text-[#6B15AD] text-sm">Payroll</span>
+                                </button>
+                                <button onClick={() => {}} className="bg-[#6B15AD]/10 hover:bg-[#6B15AD]/20 transition rounded-2xl p-4 flex flex-col items-center justify-center text-center aspect-[4/3]">
+                                    <FiBriefcase className="text-3xl text-[#6B15AD] mb-2" />
+                                    <span className="font-bold text-[#6B15AD] text-sm">Info</span>
+                                </button>
+                                <button onClick={() => {}} className="bg-[#6B15AD]/10 hover:bg-[#6B15AD]/20 transition rounded-2xl p-4 flex flex-col items-center justify-center text-center aspect-[4/3]">
+                                    <FiAlertCircle className="text-3xl text-[#6B15AD] mb-2" />
+                                    <span className="font-bold text-[#6B15AD] text-sm">Alerts</span>
                                 </button>
                             </div>
+                        </div>
+
+                        {/* Recent Activity Mini View */}
+                        <div className="bg-[#6B15AD]/[0.05] rounded-2xl p-6 border border-[#6B15AD]/10">
+                            <h3 className="text-xl font-bold text-[#6B15AD] mb-4">Overview</h3>
+                            
+                            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+                                <p className="text-xs uppercase font-bold tracking-wider text-gray-400 mb-2">Latest Payroll</p>
+                                {isLoadingPayroll ? (
+                                    <p className="text-gray-500 text-sm">Loading...</p>
+                                ) : payrolls.length > 0 ? (
+                                    <div className="flex justify-between items-end">
+                                        <div>
+                                            <p className="font-bold text-gray-800">{getMonthName(payrolls[0].month)} {payrolls[0].year}</p>
+                                            <p className="text-xs font-semibold text-green-600 uppercase mt-1 px-2 py-0.5 bg-green-50 rounded inline-block">{payrolls[0].status}</p>
+                                        </div>
+                                        <p className="text-xl font-black text-[#6B15AD]">{formatCurrency(payrolls[0].netSalary)}</p>
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-500 text-sm">No payroll available</p>
+                                )}
+                            </div>
+
+                            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm mt-3">
+                                <p className="text-xs uppercase font-bold tracking-wider text-gray-400 mb-2">Recent Leaves</p>
+                                {leaveRequests.length > 0 ? (
+                                    <div className="flex justify-between items-end">
+                                        <div>
+                                            <p className="font-bold text-gray-800 capitalize">{leaveRequests[0].type} Leave</p>
+                                            <p className={`text-xs font-semibold uppercase mt-1 px-2 py-0.5 rounded inline-block ${leaveRequests[0].status === 'approved' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'}`}>
+                                                {leaveRequests[0].status}
+                                            </p>
+                                        </div>
+                                        <p className="text-sm font-medium text-gray-500">{new Date(leaveRequests[0].from).toLocaleDateString()}</p>
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-500 text-sm">No recent requests</p>
+                                )}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </main>
+
+            {/* Modal functionality remains */}
+            {showPayrollModal && selectedPayroll && (
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg p-6 relative">
+                        <button onClick={() => setShowPayrollModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 p-2 rounded-full">
+                            <FiX />
+                        </button>
+                        <div className="text-center mb-6 pt-4">
+                            <div className="w-16 h-16 bg-[#6B15AD]/10 text-[#6B15AD] rounded-full mx-auto flex items-center justify-center mb-3">
+                                <FiDollarSign className="text-3xl" />
+                            </div>
+                            <h3 className="text-2xl font-black text-[#6B15AD]">Payslip</h3>
+                            <p className="text-gray-500 font-medium">{getMonthName(selectedPayroll.month)} {selectedPayroll.year}</p>
+                        </div>
+
+                        <div className="space-y-4 mb-6">
+                            <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                <span className="text-gray-600 font-medium">Basic Salary</span>
+                                <span className="font-bold text-gray-800">{formatCurrency(selectedPayroll.basicSalary)}</span>
+                            </div>
+                            <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                <span className="text-gray-600 font-medium">Gross Pay</span>
+                                <span className="font-bold text-gray-800">{formatCurrency(selectedPayroll.grossSalary)}</span>
+                            </div>
+                            <div className="flex justify-between p-3 bg-red-50 rounded-lg">
+                                <span className="text-red-600 font-medium">Total Deductions</span>
+                                <span className="font-bold text-red-700">{formatCurrency(selectedPayroll.totalDeductions)}</span>
+                            </div>
+                        </div>
+
+                        <div className="bg-[#6B15AD] text-white p-5 rounded-2xl flex justify-between items-center shadow-lg">
+                            <span className="font-bold uppercase tracking-wider text-sm opacity-90">Net Payable</span>
+                            <span className="text-3xl font-black">{formatCurrency(selectedPayroll.netSalary)}</span>
                         </div>
                     </div>
                 </div>
             )}
         </div>
     );
-};
 
-export default EmployeeDashboard; 
+}
+
+export default EmployeeDashboard;

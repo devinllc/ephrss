@@ -9,7 +9,7 @@ const AdminPayrollDashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
-    const [showGenerateModal, setShowGenerateModal] = useState(true);
+    const [showGenerateModal, setShowGenerateModal] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [payrollForm, setPayrollForm] = useState({
         month: new Date().getMonth() + 1,
@@ -275,8 +275,7 @@ const AdminPayrollDashboard = () => {
                             </button>
                         </div>
 
-                        {/* Error and Success Messages */}
-                        {/* {error && (
+                        {error && (
                             <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-4">
                                 {error}
                             </div>
@@ -286,8 +285,7 @@ const AdminPayrollDashboard = () => {
                             <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded mb-4">
                                 {successMessage}
                             </div>
-                        )} */}
-                        <p className='p-4'> Generate New Payroll is Premium Featers Upgrade Now </p>
+                        )}
                         {isLoading ? (
                             <div className="flex justify-center py-8">
                                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>

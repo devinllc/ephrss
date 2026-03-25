@@ -5,7 +5,7 @@ import CreateEmployee from '../components/CreateEmployee';
 import { authenticatedFetch, parseJsonResponse, resetEmployeeDevice, API_BASE_URL } from '../utils/api';
 // import AttendanceList from './Attendance';
 // import LeaveList from './Leave';
-import { FiLogOut, FiUserPlus, FiCalendar, FiEye, FiRefreshCw, FiCheckCircle, FiPlus, FiClipboard, FiDollarSign } from 'react-icons/fi';
+import { FiLogOut, FiUserPlus, FiCalendar, FiEye, FiRefreshCw, FiCheckCircle, FiPlus, FiClipboard, FiDollarSign, FiActivity, FiTrendingUp, FiBell } from 'react-icons/fi';
 import TaskForm from '../components/TaskForm';
 import { motion, AnimatePresence } from 'framer-motion';
 // Mock data function for fallback
@@ -349,6 +349,20 @@ const handleLeaveClick = () => {
     </nav>
 
     <main className="flex-1 max-w-7xl w-full mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+        <div>
+          <h2 className="text-2xl font-black text-slate-900">Admin Command Center</h2>
+          <p className="text-slate-400 text-sm">Real-time oversight of company operations and compliance</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end">
+             <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">System Status</span>
+             <span className="flex items-center gap-1.5 text-emerald-500 font-bold text-sm">
+               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> Operational
+             </span>
+          </div>
+        </div>
+      </div>
       {/* Error Alert */}
       <AnimatePresence>
         {error && (
@@ -369,96 +383,122 @@ const handleLeaveClick = () => {
       </AnimatePresence>
 
       {/* Dashboard Quick Actions */}
-      {/* Quick Actions Grid (Improved) */}
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8 px-4 sm:px-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-12">
   {/* Add Employee Card */}
   <motion.div
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    className="bg-gradient-to-br from-indigo-600 to-blue-500 text-white rounded-xl shadow-lg cursor-pointer"
+    whileHover={{ y: -4, shadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+    className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm cursor-pointer group transition-all"
     onClick={openCreateEmployeeModal}
   >
-    <div className="p-6 flex items-center">
-      <div className="bg-white/10 p-3 rounded-lg">
-        <FiUserPlus className="text-2xl" />
-      </div>
-      <div className="ml-4">
-        <h3 className="text-lg font-semibold">Add Employee</h3>
-        <p className="text-sm opacity-90">Register new team member</p>
-      </div>
+    <div className="bg-indigo-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 transition-colors">
+      <FiUserPlus className="text-xl text-indigo-600 group-hover:text-white" />
     </div>
+    <h3 className="text-slate-900 font-bold">Add Employee</h3>
+    <p className="text-slate-400 text-xs mt-1">Direct recruitment & onboarding</p>
   </motion.div>
 
   {/* Tasks Card */}
   <motion.div
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    className="bg-gradient-to-br from-green-600 to-emerald-500 text-white rounded-xl shadow-lg cursor-pointer"
-    onClick={() => setShowTaskModal(true)}
+    whileHover={{ y: -4, shadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+    className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm cursor-pointer group transition-all"
+    onClick={() => navigate('/admin/tasks')}
   >
-    <div className="p-6 flex items-center">
-      <div className="bg-white/10 p-3 rounded-lg">
-        <FiClipboard className="text-2xl" />
-      </div>
-      <div className="ml-4">
-        <h3 className="text-lg font-semibold">Tasks</h3>
-        <p className="text-sm opacity-90">Manage assignments</p>
-      </div>
+    <div className="bg-emerald-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-600 transition-colors">
+      <FiClipboard className="text-xl text-emerald-600 group-hover:text-white" />
     </div>
+    <h3 className="text-slate-900 font-bold">Task Control</h3>
+    <p className="text-slate-400 text-xs mt-1">Lifecycle & performance tracking</p>
   </motion.div>
 
   {/* Attendance Card */}
   <motion.div
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    className="bg-gradient-to-br from-amber-500 to-orange-400 text-white rounded-xl shadow-lg cursor-pointer"
+    whileHover={{ y: -4, shadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+    className="bg-amber-50 border border-amber-100 p-6 rounded-2xl shadow-sm cursor-pointer group transition-all"
     onClick={() => navigate('/attendance')}
   >
-    <div className="p-6 flex items-center">
-      <div className="bg-white/10 p-3 rounded-lg">
-        <FiCheckCircle className="text-2xl" />
-      </div>
-      <div className="ml-4">
-        <h3 className="text-lg font-semibold">Attendance</h3>
-        <p className="text-sm opacity-90">View records</p>
-      </div>
+    <div className="bg-white w-12 h-12 rounded-xl flex items-center justify-center mb-4 shadow-sm">
+      <FiCheckCircle className="text-xl text-amber-600" />
     </div>
+    <h3 className="text-slate-900 font-bold">Attendance</h3>
+    <p className="text-slate-400 text-xs mt-1">Verify logs & geofence hits</p>
   </motion.div>
 
   {/* Leave Card */}
   <motion.div
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    className="bg-gradient-to-br from-purple-600 to-fuchsia-500 text-white rounded-xl shadow-lg cursor-pointer"
+    whileHover={{ y: -4, shadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+    className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm cursor-pointer group transition-all"
     onClick={() => navigate('/leave')}
   >
-    <div className="p-6 flex items-center">
-      <div className="bg-white/10 p-3 rounded-lg">
-        <FiCalendar className="text-2xl" />
-      </div>
-      <div className="ml-4">
-        <h3 className="text-lg font-semibold">Leave</h3>
-        <p className="text-sm opacity-90">Manage requests</p>
-      </div>
+    <div className="bg-fuchsia-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:bg-fuchsia-600 transition-colors">
+      <FiCalendar className="text-xl text-fuchsia-600 group-hover:text-white" />
     </div>
+    <h3 className="text-slate-900 font-bold">Leave Management</h3>
+    <p className="text-slate-400 text-xs mt-1">Review & balance tracking</p>
   </motion.div>
 
   {/* Payroll Card */}
   <motion.div
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    className="bg-gradient-to-br from-teal-600 to-cyan-500 text-white rounded-xl shadow-lg cursor-pointer"
+    whileHover={{ y: -4, shadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+    className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm cursor-pointer group transition-all"
     onClick={() => navigate('/admin/payroll')}
   >
-    <div className="p-6 flex items-center">
-      <div className="bg-white/10 p-3 rounded-lg">
-        <FiDollarSign className="text-2xl" />
-      </div>
-      <div className="ml-4">
-        <h3 className="text-lg font-semibold">Payroll</h3>
-        <p className="text-sm opacity-90">Generate & approve</p>
-      </div>
+    <div className="bg-teal-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:bg-teal-600 transition-colors">
+      <FiDollarSign className="text-xl text-teal-600 group-hover:text-white" />
     </div>
+    <h3 className="text-slate-900 font-bold">Payroll</h3>
+    <p className="text-slate-400 text-xs mt-1">Automated disbursements</p>
+  </motion.div>
+
+  {/* Field Tracking Card */}
+  <motion.div
+    whileHover={{ y: -4, shadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+    className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm cursor-pointer group transition-all"
+    onClick={() => navigate('/admin/field-tracking')}
+  >
+    <div className="bg-sky-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:bg-sky-600 transition-colors">
+      <FiActivity className="text-xl text-sky-600 group-hover:text-white" />
+    </div>
+    <h3 className="text-slate-900 font-bold">Field Operations</h3>
+    <p className="text-slate-400 text-xs mt-1">Live logistics & positioning</p>
+  </motion.div>
+
+  {/* Performance Card */}
+  <motion.div
+    whileHover={{ y: -4, shadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+    className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm cursor-pointer group transition-all"
+    onClick={() => navigate('/admin/performance')}
+  >
+    <div className="bg-indigo-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 transition-colors">
+      <FiTrendingUp className="text-xl text-indigo-600 group-hover:text-white" />
+    </div>
+    <h3 className="text-slate-900 font-bold">Analytics</h3>
+    <p className="text-slate-400 text-xs mt-1">Growth & KPI monitoring</p>
+  </motion.div>
+
+  {/* Alerts Card */}
+  <motion.div
+    whileHover={{ y: -4, shadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+    className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm cursor-pointer group transition-all"
+    onClick={() => navigate('/admin/alerts')}
+  >
+    <div className="bg-red-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+      <FiBell className="text-xl text-red-600 group-hover:text-white" />
+    </div>
+    <h3 className="text-slate-900 font-bold">Alert Center</h3>
+    <p className="text-slate-400 text-xs mt-1">Critical system events</p>
+  </motion.div>
+
+  {/* Settings Card */}
+  <motion.div
+    whileHover={{ y: -4, shadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+    className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm cursor-pointer group transition-all"
+    onClick={() => navigate('/admin/settings')}
+  >
+    <div className="bg-slate-50 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:bg-slate-900 transition-colors">
+      <FiRefreshCw className="text-xl text-slate-600 group-hover:text-white transition-all group-hover:rotate-180" />
+    </div>
+    <h3 className="text-slate-900 font-bold">Configuration</h3>
+    <p className="text-slate-400 text-xs mt-1">Platform-wide orchestration</p>
   </motion.div>
 </div>
 

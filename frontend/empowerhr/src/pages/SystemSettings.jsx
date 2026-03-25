@@ -108,6 +108,37 @@ const SystemSettings = () => {
             </p>
           </section>
 
+          {/* Company Geofencing */}
+          <section className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-slate-200/50 border border-slate-100">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-4 bg-blue-50 rounded-2xl text-blue-600">
+                <BsGlobe size={28} />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Workspace Geofencing</h2>
+                <p className="text-slate-400 text-sm">Define authorized attendance boundaries</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+               <div className="space-y-2">
+                 <label className="text-[10px] font-black text-slate-400 uppercase">Latitude</label>
+                 <input type="number" step="0.0001" className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm" placeholder="12.9716" />
+               </div>
+               <div className="space-y-2">
+                 <label className="text-[10px] font-black text-slate-400 uppercase">Longitude</label>
+                 <input type="number" step="0.0001" className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm" placeholder="77.5946" />
+               </div>
+               <div className="space-y-2">
+                 <label className="text-[10px] font-black text-slate-400 uppercase">Radius (meters)</label>
+                 <input type="number" className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm" placeholder="200" />
+               </div>
+            </div>
+            <button className="mt-6 px-10 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-black transition-all shadow-lg shadow-slate-100">
+              Update Perimeter
+            </button>
+          </section>
+
           {/* Billing Card */}
           <section className="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
             <div className="relative z-10 flex justify-between items-center">

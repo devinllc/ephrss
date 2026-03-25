@@ -155,7 +155,7 @@ const ManagerPortal = () => {
             <div className="bg-indigo-600 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-200">
               <p className="text-indigo-100 text-xs font-bold uppercase mb-2">Pro Tip</p>
               <p className="text-sm font-bold leading-relaxed">
-                Employees with efficiency > 90% are suitable for complex high-priority tasks.
+                Employees with efficiency &gt; 90% are suitable for complex high-priority tasks.
               </p>
             </div>
           </div>

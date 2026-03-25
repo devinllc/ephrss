@@ -4,6 +4,7 @@ import { loginAdmin, loginEmployee } from '../utils/api';
 import { FiMail, FiLock, FiUserCheck } from 'react-icons/fi';
 import loginImg from '../assets/login.png';
 import { motion } from 'framer-motion';
+import Cookies from 'js-cookie';
 
 
 const panelVariants = {
@@ -39,9 +40,17 @@ const Login = () => {
       }
       if (response.token) {
         localStorage.setItem('token', response.token);
+        localStorage.setItem('userRole', loginData.role);
+        if (response.user) {
+          localStorage.setItem('userData', JSON.stringify(response.user));
+          Cookies.set('userData', JSON.stringify(response.user), { expires: 7 });
+        }
+        Cookies.set('token', response.token, { expires: 7 });
+        Cookies.set('userRole', loginData.role, { expires: 7 });
+        
         window.location.href = '/';
       } else {
-        setError('Login failed: No token received');
+        setError('Verification failed: Security token mismatch');
       }
     } catch (err) {
       setError('Failed to login. Please check your credentials.');
@@ -82,9 +91,25 @@ const Login = () => {
           exit="exit"
           className="w-full max-w-md px-8 py-12 bg-white rounded-2xl shadow-xl space-y-8"
         >
-          <div>
-            <h2 className="text-center text-3xl font-bold text-blue-900 mb-1">EmpowerHR</h2>
-            <p className="text-center text-gray-500 mb-8">Welcome Back! Please Sign in to your account.</p>
+          <div className="space-y-2">
+            <h2 className="text-center text-4xl font-black text-slate-900 tracking-tight">EmpowerHR</h2>
+            <p className="text-center text-slate-400 text-sm font-medium">Enterprise Intelligence & Workforce Management</p>
+          </div>
+          <div className="bg-slate-50 p-1 rounded-2xl border border-slate-100 flex gap-1">
+             <button 
+                type="button"
+                onClick={() => setLoginData({...loginData, role: 'employee'})}
+                className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${loginData.role === 'employee' ? 'bg-white shadow-lg text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
+             >
+                Employee
+             </button>
+             <button 
+                type="button"
+                onClick={() => setLoginData({...loginData, role: 'admin'})}
+                className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${loginData.role === 'admin' ? 'bg-white shadow-lg text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
+             >
+                Administrator
+             </button>
           </div>
           <form className="space-y-6" onSubmit={handleLogin}>
             {error && (
@@ -124,21 +149,6 @@ const Login = () => {
                   />
                 </div>
               </div>
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Login As</label>
-                <div className="relative">
-                  <FiUserCheck className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <select
-                    required
-                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none bg-white"
-                    value={loginData.role}
-                    onChange={e => setLoginData({ ...loginData, role: e.target.value })}
-                  >
-                    <option value="employee">Employee</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-              </div>
             </div>
             <div className="flex items-center justify-between">
               <label className="flex items-center text-sm text-gray-700">
@@ -152,11 +162,11 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2.5 px-4 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-md shadow transition ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
+              className={`w-full py-4 px-4 bg-slate-900 hover:bg-black text-white font-black rounded-2xl shadow-xl shadow-slate-200 transition-all ${
+                loading ? 'opacity-50 cursor-not-allowed scale-[0.98]' : 'hover:-translate-y-0.5 active:scale-[0.98]'
               }`}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Authenticating...' : 'Secure Sign In'}
             </button>
             <div className="text-center text-sm text-gray-700 mt-4">
               Don’t have an account yet?{' '}

@@ -1,0 +1,1718 @@
+{
+    "info": {
+      "name": "EmpowerHR Backend APIs",
+      "_postman_id": "b7a2f1f0-0a3d-4b5e-a2ab-3c3d3f0a2c77",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": "Import into Postman. Set `token` variable after login. Many routes use `/attendence`, `/payrole` (note spelling) and require `Authorization: Bearer {{token}}`."
+    },
+    "variable": [
+      { "key": "baseProtocol", "value": "https" },
+      { "key": "baseHost", "value": "ephrssbackend.vercel.app" },
+      { "key": "baseUrl", "value": "https://ephrssbackend.vercel.app" },
+      { "key": "token", "value": "" },
+      { "key": "employeeId", "value": "" },
+      { "key": "staffId", "value": "" },
+      { "key": "payrollId", "value": "" },
+      { "key": "projectId", "value": "" },
+      { "key": "taskId", "value": "" },
+      { "key": "leaveId", "value": "" },
+      { "key": "alertId", "value": "" },
+      { "key": "deviceId", "value": "" },
+      { "key": "latitude", "value": "12.9716" },
+      { "key": "longitude", "value": "77.5946" }
+    ],
+    "item": [
+      {
+        "name": "Auth",
+        "item": [
+          {
+            "name": "Admin Signup",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"fullName\": \"John Doe\",\n  \"companyName\": \"Acme Inc\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securePassword123\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/admin/signup",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["admin", "signup"]
+              }
+            }
+          },
+          {
+            "name": "Admin Login",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securePassword123\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/admin/login",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["admin", "login"]
+              }
+            }
+          },
+          {
+            "name": "Admin Logout",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/admin/logout",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["admin", "logout"]
+              }
+            }
+          },
+          {
+            "name": "Employee Login (deviceId required)",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"jane@example.com\",\n  \"password\": \"securePassword123\",\n  \"deviceId\": \"{{deviceId}}\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/employees/login",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["employees", "login"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Admin Profile / Company",
+        "item": [
+          {
+            "name": "Get Admin Settings",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/admin/settings",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["admin", "settings"]
+              }
+            }
+          },
+          {
+            "name": "Update Admin Profile",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"companyName\": \"Acme Inc\",\n  \"contactNumber\": \"+1234567890\",\n  \"address\": \"Some address\",\n  \"workingHours\": \"09:00-18:00\",\n  \"companyLogo\": \"https://example.com/logo.png\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/admin/profile",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["admin", "profile"]
+              }
+            }
+          },
+          {
+            "name": "Get Admin Location",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/admin/location",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["admin", "location"]
+              }
+            }
+          },
+          {
+            "name": "Update Admin Location (geofence)",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"latitude\": 12.9716,\n  \"longitude\": 77.5946,\n  \"radiusInMeters\": 300\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/admin/location",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["admin", "location"]
+              }
+            }
+          },
+          {
+            "name": "Reset Device ID (admin/:id/reset-device)",
+            "request": {
+              "method": "PATCH",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/admin/{{employeeId}}/reset-device",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["admin", "{{employeeId}}", "reset-device"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Employees",
+        "item": [
+          {
+            "name": "Create Employee (admin/hr)",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Jane Smith\",\n  \"phone\": \"+1234567890\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"securePassword123\",\n  \"role\": \"employee\",\n  \"department\": \"Engineering\",\n  \"employmentType\": \"full-time\",\n  \"dob\": \"1990-01-01\",\n  \"gender\": \"female\",\n  \"address\": \"123 Main St, City\",\n  \"emergencyContact\": \"+1987654321\",\n  \"salary\": 50000,\n  \"bankDetails\": {\n    \"accountNumber\": \"1234567890\",\n    \"ifsc\": \"ABCD0123456\"\n  }\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/employees/create",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["employees", "create"]
+              }
+            }
+          },
+          {
+            "name": "Get Employees (admin/hr) - /employees/all",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/employees/all?limit=20&page=1",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["employees", "all"],
+                "query": [
+                  { "key": "limit", "value": "20" },
+                  { "key": "page", "value": "1" }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Employees (admin/hr) - /employees/alls",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/employees/alls?limit=20&page=1",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["employees", "alls"],
+                "query": [
+                  { "key": "limit", "value": "20" },
+                  { "key": "page", "value": "1" }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get My Profile (employee)",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/employees/profile",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["employees", "profile"]
+              }
+            }
+          },
+          {
+            "name": "Update My Profile (employee)",
+            "request": {
+              "method": "PUT",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"phone\": \"+1111111111\",\n  \"address\": \"Updated address\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/employees/profile",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["employees", "profile"]
+              }
+            }
+          },
+          {
+            "name": "Upload Document (multipart) - /employees/upload-document",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "body": {
+                "mode": "formdata",
+                "formdata": [
+                  { "key": "document", "type": "file", "src": "", "name": "document" },
+                  { "key": "docName", "type": "text", "value": "Resume.pdf" }
+                ]
+              },
+              "url": {
+                "raw": "{{baseUrl}}/employees/upload-document",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["employees", "upload-document"]
+              }
+            }
+          },
+          {
+            "name": "Employee Logout",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/employees/logout",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["employees", "logout"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Saved Logins (device mirror)",
+        "item": [
+          {
+            "name": "Save Login Data (no auth) - POST /saved-logins",
+            "request": {
+              "method": "POST",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"deviceId\": \"{{deviceId}}\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"securePassword123\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/saved-logins",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["saved-logins"]
+              }
+            }
+          },
+          {
+            "name": "Get Saved Login by deviceId - GET /saved-logins/:deviceId",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/saved-logins/{{deviceId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["saved-logins", "{{deviceId}}"]
+              }
+            }
+          },
+          {
+            "name": "Clear Saved Login by deviceId - DELETE /saved-logins/:deviceId",
+            "request": {
+              "method": "DELETE",
+              "url": {
+                "raw": "{{baseUrl}}/saved-logins/{{deviceId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["saved-logins", "{{deviceId}}"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Attendance (/attendence)",
+        "item": [
+          {
+            "name": "Punch In (employee) - POST /attendence/punch-in",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"lat\": {{latitude}},\n  \"lng\": {{longitude}},\n  \"photoUrl\": \"https://example.com/selfie.jpg\",\n  \"deviceId\": \"{{deviceId}}\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/attendence/punch-in",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["attendence", "punch-in"]
+              }
+            }
+          },
+          {
+            "name": "Punch Out (employee) - POST /attendence/punch-out",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"lat\": {{latitude}},\n  \"lng\": {{longitude}},\n  \"photoUrl\": \"https://example.com/selfie-out.jpg\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/attendence/punch-out",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["attendence", "punch-out"]
+              }
+            }
+          },
+          {
+            "name": "Get My Attendance Status (employee) - GET /attendence/status",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/attendence/status",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["attendence", "status"]
+              }
+            }
+          },
+          {
+            "name": "Verify Attendance (admin/hr) - PATCH /attendence/:id/verify",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{ \"status\": \"present\" }"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/attendence/{{taskId}}/verify",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["attendence", "{{taskId}}", "verify"]
+              }
+            }
+          },
+          {
+            "name": "Mark Present/Absent (admin/hr) - POST /attendence/admin/mark",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"staffId\": \"{{staffId}}\",\n  \"date\": \"2026-03-25T00:00:00.000Z\",\n  \"isPresent\": true,\n  \"status\": \"present\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/attendence/admin/mark",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["attendence", "admin", "mark"]
+              }
+            }
+          },
+          {
+            "name": "Admin List Attendance - GET /attendence/",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/attendence/?limit=80",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["attendence", ""],
+                "query": [
+                  { "key": "limit", "value": "80" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Leave (/leave)",
+        "item": [
+          {
+            "name": "Apply Leave (employee) - POST /leave/apply",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"fromDate\": \"2026-03-10T00:00:00.000Z\",\n  \"toDate\": \"2026-03-12T00:00:00.000Z\",\n  \"reason\": \"Family vacation\",\n  \"type\": \"casual\",\n  \"attachment\": \"optional\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/leave/apply",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["leave", "apply"]
+              }
+            }
+          },
+          {
+            "name": "Employee Leave Requests - GET /leave/requests",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/leave/requests",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["leave", "requests"]
+              }
+            }
+          },
+          {
+            "name": "Approve/Reject Leave (admin/hr) - POST /leave/approve-reject",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"leaveId\": \"{{leaveId}}\",\n  \"status\": \"approved\",\n  \"adminNote\": \"Approved\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/leave/approve-reject",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["leave", "approve-reject"]
+              }
+            }
+          },
+          {
+            "name": "Cancel Leave (admin/hr) - POST /leave/cancel",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{ \"leaveId\": \"{{leaveId}}\" }"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/leave/cancel",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["leave", "cancel"]
+              }
+            }
+          },
+          {
+            "name": "Admin List Leaves - GET /leave/",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/leave/?page=1&limit=10&status=pending&type=casual",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["leave", ""],
+                "query": [
+                  { "key": "page", "value": "1" },
+                  { "key": "limit", "value": "10" },
+                  { "key": "status", "value": "pending" },
+                  { "key": "type", "value": "casual" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Payroll (/payrole)",
+        "item": [
+          {
+            "name": "Generate Payroll (admin/hr) - POST /payrole/generate",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"employeeId\": \"{{employeeId}}\",\n  \"month\": 3,\n  \"year\": 2026,\n  \"totalWorkingDays\": 22,\n  \"basicSalary\": 50000,\n  \"allowances\": [\n    { \"type\": \"HRA\", \"amount\": 5000 }\n  ],\n  \"deductions\": [\n    { \"type\": \"PF\", \"amount\": 1800 }\n  ]\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/payrole/generate",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["payrole", "generate"]
+              }
+            }
+          },
+          {
+            "name": "Approve Payroll (admin/hr) - PATCH /payrole/approve",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{ \"payrollId\": \"{{payrollId}}\" }"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/payrole/approve",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["payrole", "approve"]
+              }
+            }
+          },
+          {
+            "name": "Employee Payroll Status - GET /payrole/status",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/payrole/status",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["payrole", "status"]
+              }
+            }
+          },
+          {
+            "name": "Admin Payroll List - GET /payrole/",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/payrole/?page=1&limit=20&status=pending&employeeId={{employeeId}}&month=3&year=2026",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["payrole", ""],
+                "query": [
+                  { "key": "page", "value": "1" },
+                  { "key": "limit", "value": "20" },
+                  { "key": "status", "value": "pending" },
+                  { "key": "employeeId", "value": "{{employeeId}}" },
+                  { "key": "month", "value": "3" },
+                  { "key": "year", "value": "2026" }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Payroll PDF - GET /payrole/:id/pdf",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/payrole/{{payrollId}}/pdf",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["payrole", "{{payrollId}}", "pdf"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Projects (/projects)",
+        "item": [
+          {
+            "name": "Create Project (admin/hr) - POST /projects",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"title\": \"Website Revamp\",\n  \"description\": \"New landing page + performance improvements\",\n  \"isVisibleToAll\": true\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/projects",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["projects"]
+              }
+            }
+          },
+          {
+            "name": "List Projects - GET /projects",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/projects",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["projects"]
+              }
+            }
+          },
+          {
+            "name": "Get Project by ID - GET /projects/:id",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/projects/{{projectId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["projects", "{{projectId}}"]
+              }
+            }
+          },
+          {
+            "name": "Delete Project - DELETE /projects/:id",
+            "request": {
+              "method": "DELETE",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/projects/{{projectId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["projects", "{{projectId}}"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Tasks (/task)",
+        "item": [
+          {
+            "name": "Create Task - POST /task",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"title\": \"Design Login Screen\",\n  \"description\": \"Create UI for login\",\n  \"assignedTo\": [\"{{employeeId}}\"],\n  \"deadline\": \"2026-03-30T00:00:00.000Z\",\n  \"priority\": \"medium\",\n  \"status\": \"in-progress\",\n  \"progress\": 0,\n  \"files\": [],\n  \"planConstraints\": { \"maxFiles\": 5, \"maxStorage\": 10485760 },\n  \"isVisibleToAssignee\": true\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/task",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task"]
+              }
+            }
+          },
+          {
+            "name": "Get Tasks (search/filter) - GET /task",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/task?search=login&status=in-progress&priority=medium&dueAfter=2026-03-01&dueBefore=2026-03-31",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task"],
+                "query": [
+                  { "key": "search", "value": "login" },
+                  { "key": "status", "value": "in-progress" },
+                  { "key": "priority", "value": "medium" },
+                  { "key": "dueAfter", "value": "2026-03-01" },
+                  { "key": "dueBefore", "value": "2026-03-31" }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Task(s) by assigned/ID - GET /task/:id",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/task/{{employeeId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "{{employeeId}}"]
+              }
+            }
+          },
+          {
+            "name": "Update Task - PUT /task/:id",
+            "request": {
+              "method": "PUT",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"description\": \"Updated description\",\n  \"status\": \"in-progress\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/task/{{taskId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "{{taskId}}"]
+              }
+            }
+          },
+          {
+            "name": "Delete Task - DELETE /task/:id",
+            "request": {
+              "method": "DELETE",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/task/{{taskId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "{{taskId}}"]
+              }
+            }
+          },
+          {
+            "name": "Assign Task - POST /task/:id/assign",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"assignedTo\": [\"{{employeeId}}\"]\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/task/{{taskId}}/assign",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "{{taskId}}", "assign"]
+              }
+            }
+          },
+          {
+            "name": "Comment on Task - POST /task/:id/comment",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"user\": \"{{employeeId}}\",\n  \"comment\": \"Looks good\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/task/{{taskId}}/comment",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "{{taskId}}", "comment"]
+              }
+            }
+          },
+          {
+            "name": "Update Status (lifecycle) - PATCH /task/update-status",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": { "mode": "raw", "raw": "{ \"taskId\": \"{{taskId}}\", \"status\": \"completed\" }" },
+              "url": {
+                "raw": "{{baseUrl}}/task/update-status",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "update-status"]
+              }
+            }
+          },
+          {
+            "name": "Update Details (generic) - PATCH /task/update-details",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"taskId\": \"{{taskId}}\",\n  \"details\": {\n    \"description\": \"New details\"\n  }\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/task/update-details",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "update-details"]
+              }
+            }
+          },
+          {
+            "name": "Get My Tasks - GET /task/my-tasks",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/task/my-tasks",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "my-tasks"]
+              }
+            }
+          },
+          {
+            "name": "Get All Admin Tasks - GET /task/admin/all",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/task/admin/all",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "admin", "all"]
+              }
+            }
+          },
+          {
+            "name": "Start Task - PATCH /task/start",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": { "mode": "raw", "raw": "{ \"taskId\": \"{{taskId}}\" }" },
+              "url": {
+                "raw": "{{baseUrl}}/task/start",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "start"]
+              }
+            }
+          },
+          {
+            "name": "Complete Task - PATCH /task/complete",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": { "mode": "raw", "raw": "{ \"taskId\": \"{{taskId}}\", \"actualTime\": \"5\" }" },
+              "url": {
+                "raw": "{{baseUrl}}/task/complete",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "complete"]
+              }
+            }
+          },
+          {
+            "name": "Reassign (bulk) - PATCH /task/assign",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"taskId\": \"{{taskId}}\",\n  \"newAssignees\": [\"{{employeeId}}\"]\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/task/assign",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "assign"]
+              }
+            }
+          },
+          {
+            "name": "Set Priority - PATCH /task/set-priority",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": { "mode": "raw", "raw": "{ \"taskId\": \"{{taskId}}\", \"priority\": \"high\" }" },
+              "url": {
+                "raw": "{{baseUrl}}/task/set-priority",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "set-priority"]
+              }
+            }
+          },
+          {
+            "name": "Set Deadline - PATCH /task/set-deadline",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": { "mode": "raw", "raw": "{ \"taskId\": \"{{taskId}}\", \"deadline\": \"2026-03-30T00:00:00.000Z\" }" },
+              "url": {
+                "raw": "{{baseUrl}}/task/set-deadline",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "set-deadline"]
+              }
+            }
+          },
+          {
+            "name": "Analytics: Me - GET /task/analytics/me",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/task/analytics/me",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "analytics", "me"]
+              }
+            }
+          },
+          {
+            "name": "Analytics: Company - GET /task/analytics/company",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/task/analytics/company",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "analytics", "company"]
+              }
+            }
+          },
+          {
+            "name": "Analytics: Employee - GET /task/analytics/:employeeId",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/task/analytics/{{employeeId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "analytics", "{{employeeId}}"]
+              }
+            }
+          },
+          {
+            "name": "Metrics: Overdue - GET /task/metrics/overdue",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/task/metrics/overdue",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "metrics", "overdue"]
+              }
+            }
+          },
+          {
+            "name": "Metrics: Completion Rate - GET /task/metrics/completion-rate",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/task/metrics/completion-rate",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["task", "metrics", "completion-rate"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Field Tracking (/field)",
+        "item": [
+          {
+            "name": "Update Location - POST /field/update-location",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"latitude\": {{latitude}},\n  \"longitude\": {{longitude}},\n  \"accuracy\": 10,\n  \"speed\": 5,\n  \"batteryLevel\": 85,\n  \"isCharging\": false\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/field/update-location",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "update-location"]
+              }
+            }
+          },
+          {
+            "name": "Get History (Admin) - GET /field/:employeeId/history?date=YYYY-MM-DD",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/{{employeeId}}/history?date=2026-03-25",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "{{employeeId}}", "history"],
+                "query": [{ "key": "date", "value": "2026-03-25" }]
+              }
+            }
+          },
+          {
+            "name": "Get Route - GET /field/route/:employeeId",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/route/{{employeeId}}?date=2026-03-25",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "route", "{{employeeId}}"],
+                "query": [{ "key": "date", "value": "2026-03-25" }]
+              }
+            }
+          },
+          {
+            "name": "Get Stops - GET /field/stops/:employeeId",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/stops/{{employeeId}}?date=2026-03-25",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "stops", "{{employeeId}}"],
+                "query": [{ "key": "date", "value": "2026-03-25" }]
+              }
+            }
+          },
+          {
+            "name": "Get Visits - GET /field/visits/:employeeId",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/visits/{{employeeId}}?date=2026-03-25",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "visits", "{{employeeId}}"],
+                "query": [{ "key": "date", "value": "2026-03-25" }]
+              }
+            }
+          },
+          {
+            "name": "Summary Me - GET /field/summary/me",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/summary/me",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "summary", "me"]
+              }
+            }
+          },
+          {
+            "name": "Summary Employee - GET /field/summary/:employeeId?date=YYYY-MM-DD",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/summary/{{employeeId}}?date=2026-03-25",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "summary", "{{employeeId}}"],
+                "query": [{ "key": "date", "value": "2026-03-25" }]
+              }
+            }
+          },
+          {
+            "name": "Analytics Me - GET /field/analytics/me",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/analytics/me",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "analytics", "me"]
+              }
+            }
+          },
+          {
+            "name": "Analytics Employee - GET /field/analytics/:employeeId",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/analytics/{{employeeId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "analytics", "{{employeeId}}"]
+              }
+            }
+          },
+          {
+            "name": "Analytics Company - GET /field/analytics/company",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/analytics/company",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "analytics", "company"]
+              }
+            }
+          },
+          {
+            "name": "Idle Report - GET /field/idle-report",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/idle-report",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "idle-report"]
+              }
+            }
+          },
+          {
+            "name": "Suspicious Activity - GET /field/suspicious-activity",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/suspicious-activity",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "suspicious-activity"]
+              }
+            }
+          },
+          {
+            "name": "Missed Visits - GET /field/missed-visits",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/field/missed-visits",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["field", "missed-visits"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Subscription (/subscription)",
+        "item": [
+          {
+            "name": "Create Subscription (admin) - POST /subscription",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"user\": \"{{employeeId}}\",\n  \"planName\": \"basic\",\n  \"price\": 199,\n  \"billingCycle\": \"monthly\",\n  \"startDate\": \"2026-03-01\",\n  \"endDate\": \"2026-03-31\",\n  \"status\": \"active\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/subscription",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["subscription"]
+              }
+            }
+          },
+          {
+            "name": "Get Subscription Info - GET /subscription/:id",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/subscription/{{employeeId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["subscription", "{{employeeId}}"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Projects/Tasks/Attendance Analytics Support (Performance & Insights)",
+        "item": [
+          {
+            "name": "Create Performance Review (admin/hr) - POST /performance",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"employeeId\": \"{{employeeId}}\",\n  \"reviewPeriod\": \"2026-Q1\",\n  \"rating\": 85,\n  \"feedback\": \"Great work\",\n  \"goalsAchieved\": true,\n  \"areasOfImprovement\": \"Communication\",\n  \"technicalRating\": 80,\n  \"behavioralRating\": 90,\n  \"punctualityRating\": 85\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/performance",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["performance"]
+              }
+            }
+          },
+          {
+            "name": "Get Performance Reviews by employee - GET /performance/:employeeId",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/performance/{{employeeId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["performance", "{{employeeId}}"]
+              }
+            }
+          },
+          {
+            "name": "Performance Employee (combiner) - GET /performance/employee/:id",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/performance/employee/{{employeeId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["performance", "employee", "{{employeeId}}"]
+              }
+            }
+          },
+          {
+            "name": "Performance Company (combiner) - GET /performance/company",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/performance/company",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["performance", "company"]
+              }
+            }
+          },
+          {
+            "name": "Performance Trends (combiner) - GET /performance/trends/:employeeId",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/performance/trends/{{employeeId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["performance", "trends", "{{employeeId}}"]
+              }
+            }
+          },
+          {
+            "name": "Get Employee Insights - GET /insights/:id",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/insights/{{employeeId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["insights", "{{employeeId}}"]
+              }
+            }
+          },
+          {
+            "name": "Get Auto Performance (insights/performance/:employeeId) - GET",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/insights/performance/{{employeeId}}?timeframe=weekly",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["insights", "performance", "{{employeeId}}"],
+                "query": [{ "key": "timeframe", "value": "weekly" }]
+              }
+            }
+          },
+          {
+            "name": "Get Task Analytics (insights/task/:taskId) - GET",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/insights/task/{{taskId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["insights", "task", "{{taskId}}"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Alerts (/alerts)",
+        "item": [
+          {
+            "name": "Get My Alerts - GET /alerts/me",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/alerts/me",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["alerts", "me"]
+              }
+            }
+          },
+          {
+            "name": "Get Company Alerts - GET /alerts/company",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/alerts/company",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["alerts", "company"]
+              }
+            }
+          },
+          {
+            "name": "Acknowledge Alert - POST /alerts/acknowledge",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{ \"alertId\": \"{{alertId}}\" }"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/alerts/acknowledge",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["alerts", "acknowledge"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Manager (/manager)",
+        "item": [
+          {
+            "name": "Team Performance - GET /manager/team-performance",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/manager/team-performance",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["manager", "team-performance"]
+              }
+            }
+          },
+          {
+            "name": "Team Alerts - GET /manager/team-alerts",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/manager/team-alerts",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["manager", "team-alerts"]
+              }
+            }
+          },
+          {
+            "name": "Assign Task (manager) - POST /manager/assign-task",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"title\": \"Manager assigned task\",\n  \"description\": \"Task description\",\n  \"assignedTo\": [\"{{employeeId}}\"],\n  \"deadline\": \"2026-03-30T00:00:00.000Z\",\n  \"priority\": \"medium\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/manager/assign-task",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["manager", "assign-task"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "AI Actions (/actions)",
+        "item": [
+          {
+            "name": "Recommendations - GET /actions/recommendations",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/actions/recommendations",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["actions", "recommendations"]
+              }
+            }
+          },
+          {
+            "name": "Reassign Task (AI) - POST /actions/reassign-task",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"taskId\": \"{{taskId}}\",\n  \"newEmployeeId\": \"{{employeeId}}\",\n  \"justification\": \"Reason for reassignment\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/actions/reassign-task",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["actions", "reassign-task"]
+              }
+            }
+          },
+          {
+            "name": "Root Cause Analysis - GET /actions/root-cause/:employeeId",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/actions/root-cause/{{employeeId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["actions", "root-cause", "{{employeeId}}"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Activity & Audit (/activity)",
+        "item": [
+          {
+            "name": "Live Employee Status - GET /activity/live/employee-status",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/activity/live/employee-status",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["activity", "live", "employee-status"]
+              }
+            }
+          },
+          {
+            "name": "Live Team Activity - GET /activity/live/team-activity",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/activity/live/team-activity",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["activity", "live", "team-activity"]
+              }
+            }
+          },
+          {
+            "name": "Audit Logs - GET /activity/audit/logs?page=1&limit=100",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/activity/audit/logs?page=1&limit=100",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["activity", "audit", "logs"],
+                "query": [
+                  { "key": "page", "value": "1" },
+                  { "key": "limit", "value": "100" }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "System (/system)",
+        "item": [
+          {
+            "name": "Integrations Webhook - POST /system/integrations/webhook",
+            "request": {
+              "method": "POST",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"platform\": \"github\",\n  \"webhookUrl\": \"https://example.com/webhook\",\n  \"events\": \"employee_onboarded\",\n  \"secretKey\": \"my-secret-key\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/system/integrations/webhook",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["system", "integrations", "webhook"]
+              }
+            }
+          },
+          {
+            "name": "Integration Status - GET /system/integrations/status",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/system/integrations/status",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["system", "integrations", "status"]
+              }
+            }
+          },
+          {
+            "name": "AI Daily Report - GET /system/ai/daily-report/:employeeId",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/system/ai/daily-report/{{employeeId}}",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["system", "ai", "daily-report", "{{employeeId}}"]
+              }
+            }
+          },
+          {
+            "name": "AI Company Insights - GET /system/ai/company-insights",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/system/ai/company-insights",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["system", "ai", "company-insights"]
+              }
+            }
+          },
+          {
+            "name": "Billing Usage - GET /system/billing/usage",
+            "request": {
+              "method": "GET",
+              "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+              "url": {
+                "raw": "{{baseUrl}}/system/billing/usage",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["system", "billing", "usage"]
+              }
+            }
+          },
+          {
+            "name": "Privacy Update (employee) - PATCH /system/privacy/update",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"workHoursTrackingOnly\": true,\n  \"offDutyMode\": false,\n  \"dataVisibility\": \"private\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/system/privacy/update",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["system", "privacy", "update"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Cron / Internal",
+        "item": [
+          {
+            "name": "Performance Cron Trigger - GET /api/cron/performance",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/api/cron/performance",
+                "protocol": "{{baseProtocol}}",
+                "host": ["{{baseHost}}"],
+                "path": ["api", "cron", "performance"]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }

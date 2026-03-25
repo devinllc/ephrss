@@ -76,7 +76,7 @@ module.exports.punchOut = async (req, res) => {
 
         // Calculate total hours worked (in decimal)
         const punchInTime = new Date(attendance.punchIn.time);
-        const punchOutTime = new Date(now);
+        const punchOutTime = new Date(punchTime);
         const totalMilliseconds = punchOutTime - punchInTime;
         const totalHours = totalMilliseconds / 1000 / 60 / 60; // convert to hours (decimal)
         attendance.totalHours = totalHours;

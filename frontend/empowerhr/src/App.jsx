@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AdminSignup from "./pages/AdminSignup";
 import AdminDashboard from "./pages/AdminDashboard";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
 import Attendance from "./pages/Attendance";
 import Leave from "./pages/Leave";
 import AdminPayrollDashboard from "./pages/AdminPayrollDashboard";
@@ -12,13 +14,19 @@ import ManagerPortal from "./pages/ManagerPortal";
 import AuditLogViewer from "./pages/AuditLogViewer";
 import SystemSettings from "./pages/SystemSettings";
 import CRMDashboard from "./pages/CRMDashboard";
+import TaskManagement from "./pages/TaskManagement";
+import FieldTracking from "./pages/FieldTracking";
+import FieldHistory from "./pages/FieldHistory";
+import PerformanceReviews from "./pages/PerformanceReviews";
+import Subscription from "./pages/Subscription";
+import Alerts from "./pages/Alerts";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || Cookies.get("token");
     setIsAuthenticated(!!token);
     setIsLoading(false);
   }, []);
@@ -50,13 +58,16 @@ function App() {
           }
         />
 
-        {/* Protected route */}
+        {/* Protected route - Home redirects based on role */}
         <Route
           path="/"
           element={
-            isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" replace />
+            isAuthenticated ? (
+              localStorage.getItem('userRole') === 'admin' || Cookies.get('userRole') === 'admin' 
+                ? <AdminDashboard /> 
+                : <EmployeeDashboard />
+            ) : <Navigate to="/login" replace />
           }
-          
         />
 
       <Route path="/attendance" element={<Attendance/>} />
@@ -95,6 +106,42 @@ function App() {
           path="/admin/crm"
           element={
             isAuthenticated ? <CRMDashboard /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/admin/tasks"
+          element={
+            isAuthenticated ? <TaskManagement /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/admin/field-tracking"
+          element={
+            isAuthenticated ? <FieldTracking /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/admin/field-history"
+          element={
+            isAuthenticated ? <FieldHistory /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/admin/performance"
+          element={
+            isAuthenticated ? <PerformanceReviews /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/admin/subscription"
+          element={
+            isAuthenticated ? <Subscription /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/admin/alerts"
+          element={
+            isAuthenticated ? <Alerts /> : <Navigate to="/login" replace />
           }
         />
         {/* Catch all */}

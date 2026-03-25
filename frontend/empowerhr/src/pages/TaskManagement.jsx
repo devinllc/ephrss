@@ -1,42 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import { FiPlus, FiSearch, FiFilter, FiCalendar, FiUser, FiClock, FiCheckCircle, FiAlertCircle, FiXCircle, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiFilter, FiCalendar, FiUser, FiClock, FiCheckCircle, FiAlertCircle, FiXCircle, FiPlay, FiStopCircle, FiMessageSquare, FiTrendingUp } from 'react-icons/fi';
 import { authenticatedFetch, parseJsonResponse, fetchEmployees, createTask, fetchProjects } from '../utils/api';
 import Cookies from 'js-cookie';
+import TaskComments from '../components/TaskComments';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Simple Modal Component
 const SimpleModal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
-
     return (
-        <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999
-        }}>
-            <div style={{
-                backgroundColor: 'white',
-                padding: '20px',
-                borderRadius: '8px',
-                width: '100%',
-                maxWidth: '500px',
-                margin: '20px',
-                position: 'relative'
-            }}>
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+            <motion.div 
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 relative overflow-hidden"
+            >
                 {children}
-            </div>
+            </motion.div>
         </div>
     );
 };
 
-// Create Task Form Component
 // Create Task Form Component
 const CreateTaskForm = ({ onClose, onSubmit, users, projects, existingTasks }) => {
     const [formData, setFormData] = useState({
@@ -58,129 +42,62 @@ const CreateTaskForm = ({ onClose, onSubmit, users, projects, existingTasks }) =
     const handleSubmit = (e) => {
         e.preventDefault();
         onSubmit(formData);
-        setFormData({
-            title: '',
-            description: '',
-            assignedTo: [],
-            deadline: '',
-            priority: 'medium',
-            projectId: '',
-            dependsOn: [],
-            blockingType: 'strict',
-            isParallel: false
-        });
     };
 
     return (
-        <div style={{ maxHeight: '80vh', overflowY: 'auto', paddingRight: '10px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Create New Task</h2>
-                <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+        <div className="max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-black text-slate-900">Create New Task</h2>
+                <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
                     <FiXCircle size={24} />
                 </button>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {/* Basic Details */}
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Title</label>
+                    <label className="block text-xs font-black text-slate-400 uppercase mb-2">Title</label>
                     <input
                         type="text"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                        className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 ring-indigo-500"
+                        placeholder="Task title..."
                         required
                     />
                 </div>
 
                 <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Description</label>
+                    <label className="block text-xs font-black text-slate-400 uppercase mb-2">Description</label>
                     <textarea
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        rows="2"
-                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                        className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 ring-indigo-500 h-24"
+                        placeholder="What needs to be done?"
                         required
                     />
                 </div>
 
-                {/* Project Selection */}
-                <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Project</label>
-                    <select
-                        value={formData.projectId}
-                        onChange={(e) => setFormData({ ...formData, projectId: e.target.value, dependsOn: [] })}
-                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                        required
-                    >
-                        <option value="">Select Project</option>
-                        {projects.map(p => (
-                            <option key={p._id} value={p._id}>{p.title || p.name}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Dependencies */}
-                {formData.projectId && (
+                <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Depends On (Task Flow)</label>
+                        <label className="block text-xs font-black text-slate-400 uppercase mb-2">Project</label>
                         <select
-                            multiple
-                            value={formData.dependsOn}
-                            onChange={(e) => {
-                                const selected = Array.from(e.target.selectedOptions, opt => opt.value);
-                                setFormData({ ...formData, dependsOn: selected });
-                            }}
-                            style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '80px' }}
+                            value={formData.projectId}
+                            onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
+                            className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 ring-indigo-500"
+                            required
                         >
-                            {projectTasks.map(t => (
-                                <option key={t._id} value={t._id}>{t.title}</option>
+                            <option value="">Select Project</option>
+                            {projects.map(p => (
+                                <option key={p._id} value={p._id}>{p.title || p.name}</option>
                             ))}
                         </select>
-                        <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>Workers can't start this task until these are done.</small>
-                    </div>
-                )}
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Blocking</label>
-                        <select
-                            value={formData.blockingType}
-                            onChange={(e) => setFormData({ ...formData, blockingType: e.target.value })}
-                            style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                        >
-                            <option value="strict">Strict (Wait for deps)</option>
-                            <option value="none">None</option>
-                        </select>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '24px' }}>
-                        <input
-                            type="checkbox"
-                            checked={formData.isParallel}
-                            onChange={(e) => setFormData({ ...formData, isParallel: e.target.checked })}
-                            id="isParallel"
-                        />
-                        <label htmlFor="isParallel" style={{ fontWeight: '500' }}>Can run in parallel?</label>
-                    </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Deadline</label>
-                        <input
-                            type="date"
-                            value={formData.deadline}
-                            onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                            style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                            required
-                        />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Priority</label>
+                        <label className="block text-xs font-black text-slate-400 uppercase mb-2">Priority</label>
                         <select
                             value={formData.priority}
                             onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                            style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                            className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 ring-indigo-500 text-indigo-600 font-bold"
                             required
                         >
                             <option value="low">Low</option>
@@ -192,7 +109,18 @@ const CreateTaskForm = ({ onClose, onSubmit, users, projects, existingTasks }) =
                 </div>
 
                 <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Assign To</label>
+                    <label className="block text-xs font-black text-slate-400 uppercase mb-2">Deadline</label>
+                    <input
+                        type="date"
+                        value={formData.deadline}
+                        onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                        className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 ring-indigo-500"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-xs font-black text-slate-400 uppercase mb-2">Assign To</label>
                     <select
                         multiple
                         value={formData.assignedTo}
@@ -200,21 +128,134 @@ const CreateTaskForm = ({ onClose, onSubmit, users, projects, existingTasks }) =
                             const selected = Array.from(e.target.selectedOptions, opt => opt.value);
                             setFormData({ ...formData, assignedTo: selected });
                         }}
-                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '80px' }}
+                        className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 ring-indigo-500 min-h-[80px]"
                         required
                     >
                         {users.map(user => (
-                            <option key={user._id} value={user._id}>{user.email}</option>
+                            <option key={user._id} value={user._id}>{user.email} ({user.name})</option>
                         ))}
                     </select>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '10px' }}>
-                    <button type="button" onClick={onClose} style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: '6px', backgroundColor: 'white' }}>Cancel</button>
-                    <button type="submit" style={{ padding: '8px 16px', border: 'none', borderRadius: '6px', backgroundColor: '#2563eb', color: 'white' }}>Create Task</button>
+                <div className="pt-4 flex gap-3">
+                    <button type="button" onClick={onClose} className="flex-1 px-6 py-3 border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition">Cancel</button>
+                    <button type="submit" className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition">Create Task</button>
                 </div>
             </form>
         </div>
+    );
+};
+
+const TaskCard = ({ task, users, tasks, onUpdateStatus }) => {
+    const [showComments, setShowComments] = useState(false);
+    
+    const assignedUser = users.find(u => u._id === (task.assignedTo?.[0]?._id || task.assignedTo?.[0] || task.assignedTo));
+    const createdByUser = users.find(u => u._id === (task.createdBy?._id || task.createdBy));
+
+    const isLocked = task.status === 'pending' && task.dependsOn?.some(depId => {
+        const depTask = tasks.find(t => t._id === depId);
+        return depTask && depTask.status !== 'completed';
+    });
+
+    const getStatusStyles = (status) => {
+        switch (status) {
+            case 'completed': return 'bg-green-100 text-green-700 border-green-200';
+            case 'in-progress': return 'bg-blue-100 text-blue-700 border-blue-200 shadow-lg shadow-blue-100 ring-2 ring-blue-50';
+            case 'pending': return 'bg-amber-100 text-amber-700 border-amber-200';
+            case 'cancelled': return 'bg-red-100 text-red-700 border-red-200';
+            default: return 'bg-slate-100 text-slate-700 border-slate-200';
+        }
+    };
+
+    const getPriorityColor = (priority) => {
+        switch (priority) {
+            case 'urgent': return 'text-red-600 bg-red-50';
+            case 'high': return 'text-orange-600 bg-orange-50';
+            case 'medium': return 'text-indigo-600 bg-indigo-50';
+            default: return 'text-slate-600 bg-slate-50';
+        }
+    };
+
+    return (
+        <motion.div 
+            layout
+            className={`bg-white rounded-3xl p-6 shadow-sm border transition-all ${isLocked ? 'grayscale opacity-60 border-slate-200' : 'border-slate-100 hover:shadow-xl hover:-translate-y-1'}`}
+        >
+            <div className="flex justify-between items-start mb-4">
+                <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                         <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${getStatusStyles(task.status)}`}>
+                            {task.status}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${getPriorityColor(task.priority)}`}>
+                            {task.priority}
+                        </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 group flex items-center gap-2">
+                        {isLocked && <FiClock className="text-slate-400" />}
+                        {task.title}
+                    </h3>
+                </div>
+                {task.projectId && (
+                    <div className="p-2 bg-slate-50 rounded-xl text-slate-400" title={task.projectId.title}>
+                        <FiBriefcase size={16} />
+                    </div>
+                )}
+            </div>
+
+            <p className="text-sm text-slate-500 line-clamp-2 mb-6">{task.description}</p>
+
+            <div className="flex flex-wrap gap-4 mb-6">
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <FiUser className="text-indigo-500" />
+                    <span>{assignedUser?.name || 'Unassigned'}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <FiCalendar className="text-indigo-500" />
+                    <span>{new Date(task.deadline).toLocaleDateString()}</span>
+                </div>
+            </div>
+
+            {/* Lifecycle Controls */}
+            <div className="flex items-center gap-2 pt-4 border-t border-slate-50">
+                {task.status === 'pending' && (
+                    <button 
+                        onClick={() => onUpdateStatus(task._id, 'in-progress')}
+                        disabled={isLocked}
+                        className="flex-1 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 transition disabled:opacity-50"
+                    >
+                        <FiPlay /> Start
+                    </button>
+                )}
+                {task.status === 'in-progress' && (
+                    <button 
+                        onClick={() => onUpdateStatus(task._id, 'completed')}
+                        className="flex-1 py-2 bg-green-600 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition"
+                    >
+                        <FiCheckCircle /> Complete
+                    </button>
+                )}
+                <button 
+                    onClick={() => setShowComments(!showComments)}
+                    className={`p-2 rounded-xl transition ${showComments ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
+                >
+                    <FiMessageSquare />
+                </button>
+            </div>
+
+            <AnimatePresence>
+                {showComments && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                    >
+                        <TaskComments taskId={task._id} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 };
 
@@ -226,383 +267,163 @@ const TaskManagement = () => {
     const [error, setError] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filters, setFilters] = useState({
-        status: '',
-        priority: '',
-        dueDate: ''
-    });
+    const [filters, setFilters] = useState({ status: '', priority: '' });
+    const [metrics, setMetrics] = useState({ overdue: 0, completionRate: 0 });
 
-    // Get user data
-    const getUserData = () => {
-        try {
-            return JSON.parse(localStorage.getItem('userData') || Cookies.get('userData') || '{}');
-        } catch (err) {
-            console.error('Error getting user data:', err);
-            return {};
-        }
-    };
-
-    // Fetch all tasks
     const fetchTasks = async () => {
         try {
             setLoading(true);
-            setError('');
-
             const queryParams = new URLSearchParams();
             if (searchQuery) queryParams.append('search', searchQuery);
             if (filters.status) queryParams.append('status', filters.status);
             if (filters.priority) queryParams.append('priority', filters.priority);
-            if (filters.dueDate) queryParams.append('dueDate', filters.dueDate);
 
-            const response = await authenticatedFetch(`/task?${queryParams.toString()}`);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch tasks: ${response.status}`);
-            }
-
-            const data = await parseJsonResponse(response);
+            const res = await authenticatedFetch(`/task?${queryParams.toString()}`);
+            const data = await parseJsonResponse(res);
             setTasks(Array.isArray(data) ? data : (data.tasks || []));
+            
+            // Fetch Metrics
+            const mRes = await authenticatedFetch('/task/metrics/completion-rate');
+            const mData = await parseJsonResponse(mRes);
+            if (mData) setMetrics(prev => ({ ...prev, completionRate: mData.rate || 0 }));
+            
+            const oRes = await authenticatedFetch('/task/metrics/overdue');
+            const oData = await parseJsonResponse(oRes);
+            if (oData) setMetrics(prev => ({ ...prev, overdue: oData.count || 0 }));
+
         } catch (err) {
             console.error('Error fetching tasks:', err);
-            setError(err.message || 'Failed to load tasks');
+            setError('Failed to sync tasks with server.');
         } finally {
             setLoading(false);
         }
     };
 
-    // Fetch users and projects
     useEffect(() => {
-        const loadInitialData = async () => {
-            try {
-                const [empRes, projRes] = await Promise.all([
-                    fetchEmployees(),
-                    fetchProjects()
-                ]);
-
-                if (empRes.success) setUsers(empRes.data);
-                if (projRes.success) setProjects(projRes.data);
-
-                if (!empRes.success || !projRes.success) {
-                    setError('Failed to load some initial data');
-                }
-            } catch (err) {
-                console.error('Error loading data:', err);
-                setError('Failed to load initial data');
-            }
+        const init = async () => {
+            const [e, p] = await Promise.all([fetchEmployees(), fetchProjects()]);
+            if (e.success) setUsers(e.data);
+            if (p.success) setProjects(p.data);
+            await fetchTasks();
         };
-
-        loadInitialData();
-    }, []);
-
-    useEffect(() => {
-        fetchTasks();
+        init();
     }, [searchQuery, filters]);
 
     const handleCreateTask = async (taskData) => {
-        try {
-            const userData = getUserData();
-
-            const result = await createTask({
-                ...taskData,
-                status: 'pending',
-                createdBy: userData._id
-            });
-
-            if (result.success) {
-                setTasks(prev => [...prev, result.data]);
-                setShowCreateModal(false);
-            } else {
-                throw new Error(result.message || 'Failed to create task');
-            }
-        } catch (err) {
-            console.error('Error creating task:', err);
-            setError(err.message || 'Failed to create task');
+        const userData = JSON.parse(Cookies.get('userData') || '{}');
+        const res = await createTask({ ...taskData, status: 'pending', createdBy: userData._id });
+        if (res.success) {
+            setShowCreateModal(false);
+            fetchTasks();
         }
     };
 
-    const handleUpdateTaskStatus = async (taskId, newStatus) => {
-        try {
-            setError('');
-            const response = await authenticatedFetch(`/task/${taskId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ status: newStatus })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to update task: ${response.status}`);
-            }
-
-            await fetchTasks(); // Refresh the task list
-        } catch (err) {
-            console.error('Error updating task:', err);
-            setError(err.message || 'Failed to update task status');
-        }
+    const handleUpdateStatus = async (taskId, status) => {
+        const res = await authenticatedFetch(`/task/${taskId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ status })
+        });
+        if (res.ok) fetchTasks();
     };
 
-    const isLocked = task.status === 'pending' && task.dependsOn?.some(depId => {
-        const depTask = tasks.find(t => t._id === depId);
-        return depTask && depTask.status !== 'completed';
-    });
-
     return (
-        <div className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden border ${isLocked ? 'border-gray-300 opacity-75' : 'border-gray-100'}`}>
-            <div className="p-6">
-                {/* Header */}
-                <div className="flex items-start justify-between mb-2">
-                    <div className="flex flex-col">
-                        {task.projectId && (
-                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">
-                                📁 {task.projectId.title || task.projectId.name || 'Project'}
-                            </span>
-                        )}
-                        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                            {isLocked && <span className="mr-2">🔒</span>}
-                            {task.title}
-                        </h3>
+        <div className="min-h-screen bg-slate-50 p-6">
+            <div className="max-w-7xl mx-auto space-y-8">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="space-y-2">
+                        <h1 className="text-4xl font-black text-slate-900 tracking-tight">Active Operations</h1>
+                        <p className="text-slate-500">Track and manage mission-critical tasks in real-time.</p>
                     </div>
-                    <div className="flex flex-col items-end space-y-1">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getPriorityBadgeColor(task.priority)}`}>
-                            {task.priority}
-                        </span>
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(task.status)}`}>
-                            {task.status}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">{task.description}</p>
-
-                {/* Task Details */}
-                <div className="space-y-3 mb-4">
-                    <div className="flex items-center text-sm text-gray-500">
-                        <FiUser className="mr-2 h-4 w-4" />
-                        <span>Assigned to: {assignedUser?.name || 'Unassigned'}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-500">
-                        <FiCalendar className="mr-2 h-4 w-4" />
-                        <span>Due: {new Date(task.deadline).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-500">
-                        <FiUser className="mr-2 h-4 w-4" />
-                        <span>Created by: {createdByUser?.name || 'Unknown'}</span>
-                    </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div className="flex space-x-2">
-                        <button
-                            onClick={() => handleUpdateTaskStatus(task._id, 'pending')}
-                            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${task.status === 'pending'
-                                    ? 'bg-yellow-100 text-yellow-800'
-                                    : 'text-gray-600 hover:bg-gray-100'
-                                }`}
-                        >
-                            Pending
-                        </button>
-                        <button
-                            onClick={() => handleUpdateTaskStatus(task._id, 'in-progress')}
-                            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${task.status === 'in-progress'
-                                    ? 'bg-blue-100 text-blue-800'
-                                    : 'text-gray-600 hover:bg-gray-100'
-                                }`}
-                        >
-                            In Progress
-                        </button>
-                        <button
-                            onClick={() => handleUpdateTaskStatus(task._id, 'completed')}
-                            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${task.status === 'completed'
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'text-gray-600 hover:bg-gray-100'
-                                }`}
-                        >
-                            Complete
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const getPriorityBadgeColor = (priority) => {
-    switch (priority) {
-        case 'urgent': return 'bg-red-100 text-red-800';
-        case 'high': return 'bg-orange-100 text-orange-800';
-        case 'medium': return 'bg-yellow-100 text-yellow-800';
-        case 'low': return 'bg-green-100 text-green-800';
-        default: return 'bg-gray-100 text-gray-800';
-    }
-};
-
-const getStatusBadgeColor = (status) => {
-    switch (status) {
-        case 'completed': return 'bg-green-100 text-green-800';
-        case 'in-progress': return 'bg-blue-100 text-blue-800';
-        case 'pending': return 'bg-yellow-100 text-yellow-800';
-        case 'cancelled': return 'bg-red-100 text-red-800';
-        default: return 'bg-gray-100 text-gray-800';
-    }
-};
-
-// Add console log to track button click
-const handleCreateButtonClick = () => {
-    console.log('Create Task button clicked');
-    console.log('Current showCreateModal state:', showCreateModal);
-    setShowCreateModal(true);
-    console.log('After setting showCreateModal to true:', true);
-};
-
-// Add console log to track modal visibility
-useEffect(() => {
-    console.log('showCreateModal changed:', showCreateModal);
-}, [showCreateModal]);
-
-if (loading) {
-    return (
-        <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="animate-pulse space-y-6">
-                    {[1, 2, 3].map((n) => (
-                        <div key={n} className="h-48 bg-white rounded-xl shadow-sm"></div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-return (
-    <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div className="flex-1 min-w-0">
-                        <h1 className="text-2xl font-bold text-gray-900">Task Management</h1>
-                        <p className="mt-1 text-sm text-gray-500">
-                            Manage and track all tasks across your organization
-                        </p>
-                    </div>
-                    <div className="mt-4 flex md:mt-0 md:ml-4">
-                        <button
-                            onClick={handleCreateButtonClick}
-                            className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                        >
-                            <FiPlus className="-ml-1 mr-2 h-5 w-5" />
-                            Create Task
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Search and Filter Section */}
-            <div className="mb-8 bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <FiSearch className="h-5 w-5 text-gray-400" />
+                    
+                    {/* Tiny Analytics Dashboard */}
+                    <div className="flex gap-4">
+                        <div className="bg-white px-6 py-4 rounded-3xl border border-slate-100 flex items-center gap-4 shadow-sm">
+                            <div className="w-10 h-10 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center">
+                                <FiAlertCircle size={20} />
+                            </div>
+                            <div>
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Overdue</h4>
+                                <p className="text-xl font-black text-slate-900">{metrics.overdue}</p>
+                            </div>
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Search tasks..."
+                        <div className="bg-white px-6 py-4 rounded-3xl border border-slate-100 flex items-center gap-4 shadow-sm">
+                            <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
+                                <FiTrendingUp size={20} />
+                            </div>
+                            <div>
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Comp. Rate</h4>
+                                <p className="text-xl font-black text-slate-900">{metrics.completionRate}%</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={() => setShowCreateModal(true)}
+                            className="bg-indigo-600 text-white px-8 py-4 rounded-3xl font-bold shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all flex items-center gap-2"
+                        >
+                            <FiPlus size={20} /> New Task
+                        </button>
+                    </div>
+                </div>
+
+                {/* Filters */}
+                <div className="bg-white p-4 rounded-3xl border border-slate-100 flex flex-wrap gap-4 shadow-sm">
+                    <div className="flex-1 min-w-[200px] relative">
+                        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input 
+                            type="text" 
+                            placeholder="Search tasks, projects, or users..." 
+                            className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-3 text-sm focus:ring-2 ring-indigo-500"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                         />
                     </div>
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <FiFilter className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <select
-                            value={filters.status}
-                            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                        >
-                            <option value="">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <FiFilter className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <select
-                            value={filters.priority}
-                            onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                        >
-                            <option value="">All Priority</option>
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
-                        </select>
-                    </div>
+                    <select 
+                        className="bg-slate-50 border-none rounded-2xl px-6 py-3 text-sm font-bold text-slate-600 focus:ring-2 ring-indigo-500"
+                        value={filters.status}
+                        onChange={(e) => setFilters({...filters, status: e.target.value})}
+                    >
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
                 </div>
+
+                {/* Task Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {tasks.map(task => (
+                        <TaskCard 
+                            key={task._id} 
+                            task={task} 
+                            users={users} 
+                            tasks={tasks}
+                            onUpdateStatus={handleUpdateStatus}
+                        />
+                    ))}
+                </div>
+
+                {tasks.length === 0 && !loading && (
+                    <div className="p-20 bg-white rounded-[3rem] border border-dashed border-slate-200 text-center">
+                         <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <FiBriefcase className="text-slate-300" size={32} />
+                         </div>
+                         <h3 className="text-xl font-bold text-slate-700">No active tasks found</h3>
+                         <p className="text-slate-400 mt-2">Try adjusting your filters or search query.</p>
+                    </div>
+                )}
             </div>
 
-            {/* Error Display */}
-            {error && (
-                <div className="mb-8 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-                    <div className="flex">
-                        <div className="flex-shrink-0">
-                            <FiXCircle className="h-5 w-5 text-red-500" />
-                        </div>
-                        <div className="ml-3">
-                            <p className="text-sm text-red-700">{error}</p>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <SimpleModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)}>
+                <CreateTaskForm 
+                    onClose={() => setShowCreateModal(false)}
+                    onSubmit={handleCreateTask}
+                    users={users}
+                    projects={projects}
+                    existingTasks={tasks}
+                />
+            </SimpleModal>
+        </div>
+    );
+};
 
-            {/* Task Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {tasks.map(task => (
-                    <TaskCard key={task._id} task={task} />
-                ))}
-            </div>
-
-            {/* Empty State */}
-            {!loading && tasks.length === 0 && (
-                <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
-                    <FiAlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No tasks found</h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                        Get started by creating a new task.
-                    </p>
-                    <div className="mt-6">
-                        <button
-                            onClick={handleCreateButtonClick}
-                            className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                        >
-                            <FiPlus className="-ml-1 mr-2 h-5 w-5" />
-                            Create Task
-                        </button>
-                    </div>
-                </div>
-            )}
-        </main>
-
-        {/* Replace the old modal with the new simple modal */}
-        <SimpleModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)}>
-            <CreateTaskForm
-                onClose={() => setShowCreateModal(false)}
-                onSubmit={handleCreateTask}
-                users={users}
-                projects={projects}
-                existingTasks={tasks}
-            />
-        </SimpleModal>
-    </div>
-);
-
-export default TaskManagement; 
+export default TaskManagement;
